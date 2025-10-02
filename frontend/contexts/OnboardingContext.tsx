@@ -53,7 +53,7 @@ const onboardingSteps: OnboardingStep[] = [
   {
     id: 'ai-workspace',
     title: '💬 AI Agent Workspace',
-    description: 'Chat with specialized AI agents like Marcus (PM), Sarah (Architect), Alex (DevOps), and more. They can help with planning, coding, deployment, and testing.',
+    description: 'Chat with specialized AI agents like Messi (Requirements Analyst), Ronaldo (Software Architect), Neymar (Developer), Mbappé (QA Tester), and Benzema (DevOps Engineer). They can help with planning, coding, deployment, and testing.',
     target: '/workspace',
     position: 'right'
   },
@@ -130,7 +130,7 @@ const onboardingSteps: OnboardingStep[] = [
   {
     id: 'keyboard-shortcuts',
     title: '⌨️ Keyboard Shortcuts',
-    description: 'Press "?" to see all shortcuts. Use 1-9 for page navigation, Ctrl+Shift+M to call Marcus, and more!',
+    description: 'Press "?" to see all shortcuts. Use 1-9 for page navigation, Ctrl+Shift+N for Neymar, Ctrl+Shift+M for Messi, Ctrl+Shift+R for Ronaldo, and more!',
     target: 'body',
     position: 'bottom'
   },
@@ -325,7 +325,15 @@ const OnboardingOverlay: React.FC<{ step: OnboardingStep }> = ({ step }) => {
                   </div>
                   <div className="flex items-center gap-2">
                     <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl+Shift+M</kbd>
-                    <span className="text-gray-700 dark:text-gray-300">Call Marcus</span>
+                    <span className="text-gray-700 dark:text-gray-300">Call Messi ⚽</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl+Shift+R</kbd>
+                    <span className="text-gray-700 dark:text-gray-300">Call Ronaldo ⚽</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl+Shift+N</kbd>
+                    <span className="text-gray-700 dark:text-gray-300">Call Neymar ⚽</span>
                   </div>
                 </div>
               </div>

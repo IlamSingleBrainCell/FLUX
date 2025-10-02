@@ -152,43 +152,69 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
 
     // Agent Actions
     {
-      id: 'agent-marcus',
-      title: 'Call Marcus (Project Manager)',
-      subtitle: 'Start conversation with PM',
-      icon: '👨‍💼',
+      id: 'agent-messi',
+      title: 'Call Messi (Requirements Analyst)',
+      subtitle: 'Get help with requirements',
+      icon: '⚽',
       category: 'agents',
       action: () => {
         router.push('/workspace');
-        // Activate Marcus agent
+        // Activate Messi agent
       },
-      keywords: ['marcus', 'project manager', 'pm', 'agent'],
+      keywords: ['messi', 'requirements analyst', 'requirements', 'agent'],
       shortcut: 'Ctrl+Shift+M'
     },
     {
-      id: 'agent-sarah',
-      title: 'Call Sarah (Developer)',
-      subtitle: 'Get development help',
-      icon: '👩‍💻',
+      id: 'agent-ronaldo',
+      title: 'Call Ronaldo (Software Architect)',
+      subtitle: 'Architecture and design help',
+      icon: '⚽',
       category: 'agents',
       action: () => {
         router.push('/workspace');
-        // Activate Sarah agent
+        // Activate Ronaldo agent
       },
-      keywords: ['sarah', 'developer', 'dev', 'code', 'agent'],
-      shortcut: 'Ctrl+Shift+S'
+      keywords: ['ronaldo', 'software architect', 'architect', 'design', 'agent'],
+      shortcut: 'Ctrl+Shift+R'
     },
     {
-      id: 'agent-alex',
-      title: 'Call Alex (DevOps)',
-      subtitle: 'Infrastructure and deployment',
-      icon: '👨‍🔧',
+      id: 'agent-neymar',
+      title: 'Call Neymar (Developer)',
+      subtitle: 'Get development and coding help',
+      icon: '⚽',
       category: 'agents',
       action: () => {
         router.push('/workspace');
-        // Activate Alex agent
+        // Activate Neymar agent
       },
-      keywords: ['alex', 'devops', 'infrastructure', 'deployment', 'agent'],
-      shortcut: 'Ctrl+Shift+A'
+      keywords: ['neymar', 'developer', 'dev', 'code', 'agent'],
+      shortcut: 'Ctrl+Shift+N'
+    },
+    {
+      id: 'agent-mbappe',
+      title: 'Call Mbappé (QA Tester)',
+      subtitle: 'Quality assurance and testing',
+      icon: '⚽',
+      category: 'agents',
+      action: () => {
+        router.push('/workspace');
+        // Activate Mbappé agent
+      },
+      keywords: ['mbappe', 'mbappé', 'qa', 'tester', 'quality', 'agent'],
+      shortcut: 'Ctrl+Shift+Q'
+    },
+    {
+      id: 'agent-benzema',
+      title: 'Call Benzema (DevOps Engineer)',
+      subtitle: 'Infrastructure and deployment',
+      icon: '⚽',
+      category: 'agents',
+      action: () => {
+        router.push('/workspace');
+        // Activate Benzema agent
+      },
+      keywords: ['benzema', 'devops', 'infrastructure', 'deployment', 'agent'],
+      shortcut: 'Ctrl+Shift+B'
     },
 
     // Search Actions
@@ -370,19 +396,66 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
 // Global keyboard shortcut hook
 export function useCommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+K or Cmd+K to open
+      // Ctrl+K or Cmd+K to open command palette
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         setIsOpen(true);
+      }
+      
+      // Agent shortcuts - Ctrl+Shift+[Key]
+      if (e.ctrlKey && e.shiftKey) {
+        switch (e.key.toLowerCase()) {
+          case 'm':
+            e.preventDefault();
+            router.push('/workspace?agent=messi');
+            break;
+          case 'r':
+            e.preventDefault();
+            router.push('/workspace?agent=ronaldo');
+            break;
+          case 'n':
+            e.preventDefault();
+            router.push('/workspace?agent=neymar');
+            break;
+          case 'q':
+            e.preventDefault();
+            router.push('/workspace?agent=mbappe');
+            break;
+          case 'b':
+            e.preventDefault();
+            router.push('/workspace?agent=benzema');
+            break;
+        }
+      }
+      
+      // Number shortcuts for navigation (1-9)
+      if (!e.ctrlKey && !e.shiftKey && !e.altKey && e.key >= '1' && e.key <= '9') {
+        const routes = [
+          '/dashboard',    // 1
+          '/projects',     // 2
+          '/workspace',    // 3
+          '/analytics',    // 4
+          '/integrations', // 5
+          '/settings',     // 6
+          '/marketplace',  // 7
+          '/timeline',     // 8
+          '/onboarding'    // 9
+        ];
+        const routeIndex = parseInt(e.key) - 1;
+        if (routes[routeIndex]) {
+          e.preventDefault();
+          router.push(routes[routeIndex]);
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [router]);
 
   return { isOpen, setIsOpen };
 }

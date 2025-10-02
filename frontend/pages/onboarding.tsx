@@ -93,13 +93,13 @@ export default function OnboardingPage() {
       ]
     },
     {
-      title: '💬 Start a Conversation with Marcus',
+      title: '💬 Start a Conversation with Neymar',
       steps: [
         'Navigate to AI Workspace',
-        'Click on Marcus (Project Manager)',
+        'Click on Neymar (Developer) ⚽',
         'Type your question or use voice',
-        'Marcus will help plan your sprint',
-        'He can collaborate with other agents'
+        'Neymar will help with coding tasks',
+        'He can collaborate with other agents like Messi and Ronaldo'
       ]
     },
     {
@@ -128,10 +128,12 @@ export default function OnboardingPage() {
     { keys: ['Ctrl', 'K'], description: 'Open Command Palette' },
     { keys: ['1-9'], description: 'Navigate to pages' },
     { keys: ['?'], description: 'Show all shortcuts' },
-    { keys: ['Ctrl', 'Shift', 'M'], description: 'Call Marcus (PM)' },
-    { keys: ['Ctrl', 'Shift', 'S'], description: 'Call Sarah (Architect)' },
-    { keys: ['Ctrl', 'Shift', 'A'], description: 'Call Alex (DevOps)' },
-    { keys: ['Ctrl', 'F'], description: 'Search in conversation' },
+    { keys: ['Ctrl', 'Shift', 'M'], description: 'Call Messi (Requirements Analyst)' },
+    { keys: ['Ctrl', 'Shift', 'R'], description: 'Call Ronaldo (Software Architect)' },
+    { keys: ['Ctrl', 'Shift', 'N'], description: 'Call Neymar (Developer)' },
+    { keys: ['Ctrl', 'Shift', 'Q'], description: 'Call Mbappé (QA Tester)' },
+    { keys: ['Ctrl', 'Shift', 'B'], description: 'Call Benzema (DevOps Engineer)' },
+    { keys: ['Ctrl', 'F'], description: 'Search conversation' }
   ];
 
   const videoTutorials = [

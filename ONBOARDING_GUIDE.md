@@ -123,13 +123,13 @@ The onboarding page (`/onboarding`) includes 4 step-by-step guides:
 5. Start chatting with AI agents
 ```
 
-#### 2. **💬 Start a Conversation with Marcus**
+#### 2. **💬 Start a Conversation with Neymar**
 ```
 1. Navigate to AI Workspace
-2. Click on Marcus (Project Manager)
+2. Click on Neymar (Developer) ⚽
 3. Type your question or use voice
-4. Marcus will help plan your sprint
-5. He can collaborate with other agents
+4. Neymar will help with coding tasks
+5. He can collaborate with other agents like Messi and Ronaldo
 ```
 
 #### 3. **🔍 Run Your First Code Review**
@@ -209,9 +209,11 @@ localStorage.getItem('flux_sample_data_enabled') // 'true' or 'false'
 | `Ctrl+K` | Open Command Palette |
 | `1-9` | Navigate to pages (1=Dashboard, 2=Projects, etc.) |
 | `?` | Show all keyboard shortcuts |
-| `Ctrl+Shift+M` | Call Marcus (Project Manager) |
-| `Ctrl+Shift+S` | Call Sarah (Software Architect) |
-| `Ctrl+Shift+A` | Call Alex (DevOps Engineer) |
+| `Ctrl+Shift+M` | Call Messi (Requirements Analyst) ⚽ |
+| `Ctrl+Shift+R` | Call Ronaldo (Software Architect) ⚽ |
+| `Ctrl+Shift+N` | Call Neymar (Developer) ⚽ |
+| `Ctrl+Shift+Q` | Call Mbappé (QA Tester) ⚽ |
+| `Ctrl+Shift+B` | Call Benzema (DevOps Engineer) ⚽ |
 | `Ctrl+F` | Search within conversation |
 
 ---
