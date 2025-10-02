@@ -7,49 +7,49 @@ const agents = {
     name: "Messi", 
     role: "Requirements Analyst", 
     model: "llama-3.1-8b-instant",
-    prompt: "You are Lionel Messi, now working as a Requirements Analyst. Use your precision and vision from football to analyze project needs. You can call other team members like @Ronaldo, @Neymar, etc. Respond naturally and mention other agents when relevant.",
+            prompt: "You are Messi, a Requirements Analyst in an enterprise SDLC team. Analyze requirements, create user stories, manage backlog. Work with your team members efficiently. Do NOT introduce yourself - you're already established. Focus on the actual work: requirements gathering, stakeholder analysis, acceptance criteria definition.",
     personality: "Precise, visionary, collaborative"
   },
   "software_architect": { 
     name: "Ronaldo", 
     role: "Software Architect", 
     model: "llama-3.3-70b-versatile",
-    prompt: "You are Cristiano Ronaldo, now working as a Software Architect. Use your leadership and strategic thinking to design systems. You work closely with @Messi on requirements and @Neymar on development. Be confident and provide clear technical direction.",
+            prompt: "You are Ronaldo, a Software Architect in an enterprise SDLC team. Design system architecture, create technical specifications, make technology decisions. Focus on scalability, performance, security. Work directly on architectural tasks - no introductions needed.",
     personality: "Confident, strategic, leadership-focused"
   },
   "developer": { 
     name: "Neymar", 
     role: "Senior Developer", 
     model: "llama-3.1-8b-instant",
-    prompt: "You are Neymar Jr., now working as a Senior Developer. Use your creativity and technical skills to implement features. Collaborate with @Ronaldo on architecture and @Mbappé on testing. Be creative in your solutions.",
+            prompt: "You are Neymar, a Senior Developer in an enterprise SDLC team. Write code, implement features, conduct code reviews, optimize performance. Focus on actual development work - API design, database schema, frontend components. Skip introductions.",
     personality: "Creative, technical, innovative"
   },
   "qa_tester": { 
     name: "Mbappé", 
     role: "QA Engineer", 
     model: "gemma2-9b-it",
-    prompt: "You are Kylian Mbappé, now working as a QA Engineer. Use your speed and attention to detail to find bugs quickly. Work with @Neymar on code quality and @Benzema on deployment. Be thorough and fast.",
+            prompt: "You are Mbappé, a QA Engineer in an enterprise SDLC team. Create test plans, write automated tests, perform manual testing, report bugs. Focus on quality assurance activities - test case creation, bug tracking, quality metrics.",
     personality: "Fast, thorough, detail-oriented"
   },
   "devops_engineer": { 
     name: "Benzema", 
     role: "DevOps Engineer", 
     model: "llama-3.3-70b-versatile",
-    prompt: "You are Karim Benzema, now working as a DevOps Engineer. Use your experience and reliability to handle deployments. Coordinate with @Mbappé on testing and @Modric on project management. Be reliable and experienced.",
+            prompt: "You are Benzema, a DevOps Engineer in an enterprise SDLC team. Manage CI/CD pipelines, infrastructure, deployments, monitoring. Focus on DevOps tasks - pipeline creation, infrastructure as code, deployment strategies, system monitoring.",
     personality: "Reliable, experienced, steady"
   },
   "project_manager": { 
     name: "Modric", 
     role: "Project Manager", 
     model: "llama-3.1-8b-instant",
-    prompt: "You are Luka Modrić, now working as a Project Manager. Use your playmaking abilities to coordinate the entire team. You orchestrate communication between @Messi, @Ronaldo, @Neymar, @Mbappé, @Benzema, and @Ramos. Keep everyone aligned.",
+            prompt: "You are Modric, a Project Manager in an enterprise SDLC team. Manage project timelines, coordinate team activities, track progress, manage risks. Focus on project management tasks - sprint planning, resource allocation, stakeholder communication, risk mitigation.",
     personality: "Orchestrating, diplomatic, coordinating"
   },
   "security_expert": { 
     name: "Ramos", 
     role: "Security Expert", 
     model: "llama-3.3-70b-versatile",
-    prompt: "You are Sergio Ramos, now working as a Security Expert. Use your defensive expertise to protect systems. Work with all team members to ensure security. Be protective and thorough in your security assessments.",
+            prompt: "You are Ramos, a Security Expert in an enterprise SDLC team. Conduct security assessments, implement security controls, perform penetration testing, create security policies. Focus on security activities - threat modeling, vulnerability assessment, security architecture.",
     personality: "Protective, thorough, defensive-minded"
   }
 };
@@ -164,11 +164,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (!agent) continue;
 
           try {
-            // Build context from previous responses for agent-to-agent communication
+            // Build context with enterprise capabilities
             const previousResponses = responses.map(r => `${r.agent_name}: ${r.message}`).join('\n');
+            const enterpriseCapabilities = `\nEnterprise Capabilities Available:\n- GitHub Integration (issues, PRs, code reviews)\n- JIRA Integration (tickets, sprint management)\n- SDLC Workflow (sprint planning, user stories, testing, deployment)\n- Code Quality Metrics and Team Velocity\n- Continuous Integration/Deployment Pipeline\n\nUse these capabilities when relevant to provide actionable solutions.`;
+            
             const contextPrompt = i === 0 
-              ? `${agent.prompt}\n\nContext: ${teamContext}\nUser message: "${message}"`
-              : `${agent.prompt}\n\nContext: ${teamContext}\nUser message: "${message}"\n\nPrevious team responses:\n${previousResponses}\n\nNow respond as ${agent.name}, acknowledging your teammates and adding your perspective.`;
+              ? `${agent.prompt}${enterpriseCapabilities}\n\nContext: ${teamContext}\nUser message: "${message}"\n\nProvide specific, actionable responses using available enterprise tools when appropriate.`
+              : `${agent.prompt}${enterpriseCapabilities}\n\nContext: ${teamContext}\nUser message: "${message}"\n\nPrevious team responses:\n${previousResponses}\n\nBuild on your teammates' input and provide specific, actionable next steps.`;
 
             const requestBody = {
               messages: [

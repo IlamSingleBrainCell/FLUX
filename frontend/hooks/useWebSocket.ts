@@ -26,6 +26,17 @@ export const useWebSocket = (sessionId: string): UseWebSocketReturn => {
     'project_manager',
     'security_expert'
   ]);
+
+  // Agent display mapping
+  const agentDisplayNames = {
+    'requirements_analyst': { name: 'Messi', role: 'Requirements Analyst' },
+    'software_architect': { name: 'Ronaldo', role: 'Software Architect' },
+    'developer': { name: 'Neymar', role: 'Senior Developer' },
+    'qa_tester': { name: 'Mbappé', role: 'QA Engineer' },
+    'devops_engineer': { name: 'Benzema', role: 'DevOps Engineer' },
+    'project_manager': { name: 'Modric', role: 'Project Manager' },
+    'security_expert': { name: 'Ramos', role: 'Security Expert' }
+  };
   const [thinkingAgents, setThinkingAgents] = useState<string[]>([]);
   const [lastError, setLastError] = useState<string | undefined>();
   const ws = useRef<WebSocket | null>(null);
