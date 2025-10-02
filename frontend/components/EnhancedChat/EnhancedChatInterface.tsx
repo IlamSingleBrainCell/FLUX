@@ -42,13 +42,13 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
   // Helper function to get agent display names
   const getAgentDisplayName = (agentId: string): string => {
     const names: { [key: string]: string } = {
-      'requirements_analyst': 'Sara',
-      'software_architect': 'Marc',
-      'developer': 'Alex',
-      'qa_tester': 'Jess',
-      'devops_engineer': 'Dave',
-      'project_manager': 'Emma',
-      'security_expert': 'Robt'
+      'requirements_analyst': 'Messi',
+      'software_architect': 'Ronaldo',
+      'developer': 'Neymar',
+      'qa_tester': 'Mbappé',
+      'devops_engineer': 'Benzema',
+      'project_manager': 'Modric',
+      'security_expert': 'Ramos'
     };
     return names[agentId] || agentId;
   };
@@ -57,8 +57,8 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
   const detectDirectCall = (message: string): string | null => {
     const lowerMsg = message.toLowerCase().trim();
     const directPatterns = [
-      /^(hi|hello|hey|greetings)\s+(sara|marc|alex|jess|dave|emma|robt)/i,
-      /^@?(sara|marc|alex|jess|dave|emma|robt)\b/i
+      /^(hi|hello|hey|greetings)\s+(messi|ronaldo|neymar|mbappé|mbappe|benzema|modric|ramos)/i,
+      /^@?(messi|ronaldo|neymar|mbappé|mbappe|benzema|modric|ramos)\b/i
     ];
     
     for (const pattern of directPatterns) {
@@ -66,13 +66,14 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
       if (match) {
         const name = match[match.length - 1].toLowerCase();
         const agentMap: { [key: string]: string } = {
-          'sara': 'requirements_analyst',
-          'marc': 'software_architect',
-          'alex': 'developer',
-          'jess': 'qa_tester',
-          'dave': 'devops_engineer',
-          'emma': 'project_manager',
-          'robt': 'security_expert'
+          'messi': 'requirements_analyst',
+          'ronaldo': 'software_architect',
+          'neymar': 'developer',
+          'mbappé': 'qa_tester',
+          'mbappe': 'qa_tester',
+          'benzema': 'devops_engineer',
+          'modric': 'project_manager',
+          'ramos': 'security_expert'
         };
         return agentMap[name] || null;
       }
@@ -290,13 +291,13 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
                   
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     {[
-                      { id: 'requirements_analyst', name: 'Sara', role: 'Requirements Analyst', color: 'border-purple-200 bg-purple-50 text-purple-700' },
-                      { id: 'software_architect', name: 'Marc', role: 'Software Architect', color: 'border-blue-200 bg-blue-50 text-blue-700' },
-                      { id: 'developer', name: 'Alex', role: 'Senior Developer', color: 'border-green-200 bg-green-50 text-green-700' },
-                      { id: 'qa_tester', name: 'Jess', role: 'QA Engineer', color: 'border-yellow-200 bg-yellow-50 text-yellow-700' },
-                      { id: 'devops_engineer', name: 'Dave', role: 'DevOps Engineer', color: 'border-red-200 bg-red-50 text-red-700' },
-                      { id: 'project_manager', name: 'Emma', role: 'Project Manager', color: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
-                      { id: 'security_expert', name: 'Robt', role: 'Security Expert', color: 'border-gray-200 bg-gray-50 text-gray-700' }
+                      { id: 'requirements_analyst', name: 'Messi', role: 'Requirements Analyst', color: 'border-purple-200 bg-purple-50 text-purple-700', avatar: '⚽' },
+                      { id: 'software_architect', name: 'Ronaldo', role: 'Software Architect', color: 'border-blue-200 bg-blue-50 text-blue-700', avatar: '🏗️' },
+                      { id: 'developer', name: 'Neymar', role: 'Senior Developer', color: 'border-green-200 bg-green-50 text-green-700', avatar: '💻' },
+                      { id: 'qa_tester', name: 'Mbappé', role: 'QA Engineer', color: 'border-yellow-200 bg-yellow-50 text-yellow-700', avatar: '🧪' },
+                      { id: 'devops_engineer', name: 'Benzema', role: 'DevOps Engineer', color: 'border-red-200 bg-red-50 text-red-700', avatar: '🚀' },
+                      { id: 'project_manager', name: 'Modric', role: 'Project Manager', color: 'border-indigo-200 bg-indigo-50 text-indigo-700', avatar: '📊' },
+                      { id: 'security_expert', name: 'Ramos', role: 'Security Expert', color: 'border-gray-200 bg-gray-50 text-gray-700', avatar: '🔒' }
                     ].map(agent => (
                       <button
                         key={agent.id}
@@ -314,16 +315,16 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
                         }`}
                       >
                         <div className="flex items-center space-x-2 mb-1">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg ${
                             selectedAgents.includes(agent.id) ? 'bg-white/80' : 'bg-gray-100'
                           }`}>
-                            {agent.name[0]}
+                            {agent.avatar}
                           </div>
                           <div className={`w-2 h-2 rounded-full ${
-                            activeAgents.includes(agent.id) ? 'bg-green-500' : 'bg-gray-300'
+                            activeAgents.includes(agent.id) ? 'bg-green-500 animate-pulse' : 'bg-gray-300'
                           }`}></div>
                         </div>
-                        <div className="text-xs font-medium">{agent.name}</div>
+                        <div className="text-xs font-semibold">{agent.name}</div>
                         <div className="text-xs opacity-70 truncate">{agent.role}</div>
                       </button>
                     ))}

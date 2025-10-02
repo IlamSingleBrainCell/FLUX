@@ -2,6 +2,7 @@
 import React from 'react';
 import { AgentInfo } from '../../types/agents';
 import { AgentAvatar } from './AgentAvatar';
+import { enterpriseAgents } from '../../config/agents';
 
 interface AgentSelectorProps {
   agents: AgentInfo[];
