@@ -145,20 +145,12 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
   return (
     <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 ${className}`}>
       <div className="max-w-full mx-auto">
-        {/* Header */}
-        <div className="bg-slate-900/95 backdrop-blur-xl shadow-2xl border-b border-slate-700/50 sticky top-0 z-50">
+        {/* Header - Removed duplicate, using header from pages/index.tsx */}
+        <div className="bg-slate-900/95 backdrop-blur-xl shadow-2xl border-b border-slate-700/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between py-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-cyan-400/30 shadow-lg">
-                  <svg className="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">FLUX</h1>
-                  <p className="text-sm text-slate-400 mt-1 font-medium">Where Agents Meet Agile</p>
-                </div>
+            <div className="flex items-center justify-between py-2">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-slate-400 font-medium">Enterprise Multi-Agent Workspace</span>
               </div>
               
               {/* Connection Status */}
@@ -370,16 +362,7 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
                       <div className="space-y-0">
                         {messages.map((message, index) => {
                           const isUser = message.agent === 'user';
-                          const agentNames: { [key: string]: string } = {
-                            'requirements_analyst': 'Sara',
-                            'software_architect': 'Marc',
-                            'developer': 'Alex',
-                            'qa_tester': 'Jess',
-                            'devops_engineer': 'Dave',
-                            'project_manager': 'Emma',
-                            'security_expert': 'Robt'
-                          };
-                          const displayName = agentNames[message.agent] || message.agent;
+                          const displayName = getAgentDisplayName(message.agent);
                           
                           return (
                             <div 

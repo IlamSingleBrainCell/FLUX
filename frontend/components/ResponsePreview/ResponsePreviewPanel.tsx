@@ -48,13 +48,13 @@ export const ResponsePreviewPanel: React.FC<ResponsePreviewPanelProps> = ({
   const getAgentInfo = (agent: string) => {
     const agentData: { [key: string]: { name: string; avatar: string; color: string } } = {
       'user': { name: 'You', avatar: '👤', color: 'bg-gray-100 text-gray-800' },
-      'requirements_analyst': { name: 'Sara', avatar: '👩‍💼', color: 'bg-purple-100 text-purple-800' },
-      'software_architect': { name: 'Marc', avatar: '👨‍💻', color: 'bg-blue-100 text-blue-800' },
-      'developer': { name: 'Alex', avatar: '👩‍💻', color: 'bg-green-100 text-green-800' },
-      'qa_tester': { name: 'Jess', avatar: '👩‍🔬', color: 'bg-yellow-100 text-yellow-800' },
-      'devops_engineer': { name: 'Dave', avatar: '👨‍🔧', color: 'bg-red-100 text-red-800' },
-      'project_manager': { name: 'Emma', avatar: '👩‍💼', color: 'bg-indigo-100 text-indigo-800' },
-      'security_expert': { name: 'Robt', avatar: '👨‍🛡️', color: 'bg-gray-100 text-gray-800' }
+      'requirements_analyst': { name: 'Messi', avatar: '⚽', color: 'bg-purple-100 text-purple-800' },
+      'software_architect': { name: 'Ronaldo', avatar: '🏗️', color: 'bg-blue-100 text-blue-800' },
+      'developer': { name: 'Neymar', avatar: '', color: 'bg-green-100 text-green-800' },
+      'qa_tester': { name: 'Mbappé', avatar: '🧪', color: 'bg-yellow-100 text-yellow-800' },
+      'devops_engineer': { name: 'Benzema', avatar: '�', color: 'bg-red-100 text-red-800' },
+      'project_manager': { name: 'Modric', avatar: '�', color: 'bg-indigo-100 text-indigo-800' },
+      'security_expert': { name: 'Ramos', avatar: '�', color: 'bg-gray-100 text-gray-800' }
     };
     
     return agentData[agent] || { name: agent, avatar: '🤖', color: 'bg-gray-100 text-gray-800' };
