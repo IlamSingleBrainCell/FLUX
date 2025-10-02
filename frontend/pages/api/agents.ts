@@ -2,13 +2,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const agents = {
-  "requirements_analyst": { name: "Sara", role: "Requirements Analyst" },
-  "software_architect": { name: "Marc", role: "Software Architect" },
-  "developer": { name: "Alex", role: "Senior Developer" },
-  "qa_tester": { name: "Jess", role: "QA Engineer" },
-  "devops_engineer": { name: "Dave", role: "DevOps Engineer" },
-  "project_manager": { name: "Emma", role: "Project Manager" },
-  "security_expert": { name: "Robt", role: "Security Expert" }
+  "requirements_analyst": { name: "Messi", role: "Requirements Analyst" },
+  "software_architect": { name: "Ronaldo", role: "Software Architect" },
+  "developer": { name: "Neymar", role: "Senior Developer" },
+  "qa_tester": { name: "Mbappé", role: "QA Engineer" },
+  "devops_engineer": { name: "Benzema", role: "DevOps Engineer" },
+  "project_manager": { name: "Modric", role: "Project Manager" },
+  "security_expert": { name: "Ramos", role: "Security Expert" }
 };
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
