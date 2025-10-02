@@ -81,9 +81,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const agentKey = detectAgent(message);
       const agent = agents[agentKey];
-      const groqApiKey = process.env.GROQ_API_KEY;
+      
+      // Debug environment variables
+      console.log('Environment check:', {
+        hasGroqKey: !!process.env.GROQ_API_KEY,
+        hasGroqKeyLower: !!process.env.groq_api_key,
+        nodeEnv: process.env.NODE_ENV,
+        allEnvKeys: Object.keys(process.env).filter(key => key.toLowerCase().includes('groq'))
+      });
+      
+      const groqApiKey = process.env.GROQ_API_KEY || process.env.groq_api_key;
 
-      if (groqApiKey) {
+      if (groqApiKey && groqApiKey.length > 10) {
         try {
           // Direct HTTP request to Groq API
           const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -133,10 +142,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(200).json({
           responses: [{
             agent: agentKey,
-            message: `Hello! I'm ${agent.name}. I received your message: "${message}". GROQ API key is not configured.`,
+            message: `Hello! I'm ${agent.name}. I received your message: "${message}". GROQ API key issue: ${groqApiKey ? 'too short' : 'not found'}. Check Vercel env vars.`,
             timestamp: new Date().toISOString()
           }],
-          groq_configured: false
+          groq_configured: false,
+          debug: {
+            hasKey: !!groqApiKey,
+            keyLength: groqApiKey?.length || 0,
+            envKeys: Object.keys(process.env).filter(key => key.toLowerCase().includes('groq'))
+          }
         });
       }
     } catch (error) {
