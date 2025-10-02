@@ -1,6 +1,6 @@
 # Vercel deployment files
-api/
 .vercel/
+deploy/
 
 # Environment variables
 .env
