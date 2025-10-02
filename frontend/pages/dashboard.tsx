@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { enterpriseAgents } from '../config/agents';
+import { useToolsStatus } from '../hooks/useToolsStatus';
 
 interface MetricCard {
   title: string;
@@ -148,6 +149,9 @@ export default function EnterpriseDashboard() {
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected'>('connected');
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  // Real-time tools status integration
+  const { tools, loading: toolsLoading, error: toolsError } = useToolsStatus(30000);
+
   useEffect(() => {
     const loadActivity = async () => {
       try {
@@ -217,7 +221,7 @@ export default function EnterpriseDashboard() {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
                 {/* Live Clock */}
                 <div className="hidden md:flex items-center space-x-2 px-4 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
                   <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,8 +251,11 @@ export default function EnterpriseDashboard() {
                   <Link href="/dashboard" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg font-medium hover:from-blue-700 hover:to-cyan-600 transition-all shadow-lg">
                     Dashboard
                   </Link>
-                  <Link href="/" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg font-medium hover:bg-slate-600 transition-colors">
-                    Workspace
+                  <Link href="/projects" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg font-medium hover:bg-slate-600 transition-colors">
+                    Projects
+                  </Link>
+                  <Link href="/workspace" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg font-medium hover:bg-slate-600 transition-colors">
+                    AI Workspace
                   </Link>
                 </nav>
               </div>
@@ -484,6 +491,139 @@ export default function EnterpriseDashboard() {
             ))}
           </div>
 
+          {/* SDLC Tools & Integrations Panel */}
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-xl mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-white flex items-center">
+                  <span className="mr-3">🔗</span>
+                  SDLC Tools & Integrations
+                </h2>
+                <p className="text-sm text-slate-400 mt-1">End-to-end development workflow automation</p>
+              </div>
+              <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors shadow-lg">
+                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Add Integration
+              </button>
+            </div>
+
+            {/* SDLC Workflow Stages */}
+            <div className="mb-6">
+              <h3 className="text-sm font-bold text-slate-300 mb-3 uppercase tracking-wide">Complete SDLC Workflow</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                {[
+                  { stage: 'Epic', icon: '📋', color: 'from-purple-500 to-pink-500', status: 'active' },
+                  { stage: 'Story', icon: '📝', color: 'from-blue-500 to-cyan-500', status: 'active' },
+                  { stage: 'Design', icon: '🎨', color: 'from-indigo-500 to-purple-500', status: 'active' },
+                  { stage: 'Code', icon: '💻', color: 'from-green-500 to-emerald-500', status: 'active' },
+                  { stage: 'Test', icon: '🧪', color: 'from-yellow-500 to-orange-500', status: 'active' },
+                  { stage: 'Deploy', icon: '🚀', color: 'from-red-500 to-rose-500', status: 'active' },
+                  { stage: 'Monitor', icon: '📊', color: 'from-teal-500 to-cyan-500', status: 'active' }
+                ].map((workflow, idx) => (
+                  <div key={idx} className="relative">
+                    <div className={`bg-gradient-to-br ${workflow.color} p-4 rounded-xl text-center shadow-lg hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer`}>
+                      <div className="text-3xl mb-2">{workflow.icon}</div>
+                      <div className="text-white font-bold text-sm">{workflow.stage}</div>
+                      <div className="text-white/80 text-xs mt-1">
+                        {workflow.status === 'active' ? 'Active' : 'Setup'}
+                      </div>
+                    </div>
+                    {idx < 6 && (
+                      <div className="hidden lg:block absolute top-1/2 -right-1.5 transform -translate-y-1/2 z-10">
+                        <svg className="w-3 h-3 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Integrated Tools Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {toolsLoading ? (
+                <div className="col-span-full text-center py-8 text-slate-400">
+                  Loading tools status...
+                </div>
+              ) : toolsError ? (
+                <div className="col-span-full text-center py-8 text-red-400">
+                  {toolsError}
+                </div>
+              ) : (
+                tools.map((tool) => {
+                  const colorClasses = {
+                    blue: { bg: 'bg-blue-600', border: 'border-blue-500/50', text: 'text-blue-400' },
+                    slate: { bg: 'bg-slate-700', border: 'border-purple-500/50', text: 'text-purple-400' },
+                    red: { bg: 'bg-red-600', border: 'border-red-500/50', text: 'text-red-400' },
+                    cyan: { bg: 'bg-cyan-600', border: 'border-cyan-500/50', text: 'text-cyan-400' },
+                    indigo: { bg: 'bg-indigo-600', border: 'border-indigo-500/50', text: 'text-indigo-400' },
+                    emerald: { bg: 'bg-emerald-600', border: 'border-emerald-500/50', text: 'text-emerald-400' },
+                    orange: { bg: 'bg-orange-600', border: 'border-orange-500/50', text: 'text-orange-400' },
+                    purple: { bg: 'bg-purple-600', border: 'border-purple-500/50', text: 'text-purple-400' }
+                  };
+
+                  const colors = colorClasses[tool.color as keyof typeof colorClasses] || colorClasses.blue;
+
+                  return (
+                    <div key={tool.id} className={`bg-slate-900/50 border border-slate-700/30 rounded-xl p-5 hover:${colors.border} transition-all group`}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-12 h-12 ${colors.bg} rounded-lg flex items-center justify-center shadow-lg`}>
+                            <span className="text-2xl">{tool.icon}</span>
+                          </div>
+                          <div>
+                            <h4 className={`font-bold text-white group-hover:${colors.text} transition-colors`}>{tool.name}</h4>
+                            <p className="text-xs text-slate-400">{tool.type}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-2 h-2 ${
+                            tool.status === 'connected' || tool.status === 'running' 
+                              ? 'bg-emerald-500' 
+                              : 'bg-red-500'
+                          } rounded-full animate-pulse`}></div>
+                          <span className={`text-xs font-bold ${
+                            tool.status === 'connected' || tool.status === 'running'
+                              ? 'text-emerald-400'
+                              : 'text-red-400'
+                          }`}>
+                            {tool.status === 'connected' ? 'Connected' : tool.status === 'running' ? 'Running' : 'Offline'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-2 mb-4">
+                        {Object.entries(tool.metrics).slice(0, 3).map(([key, value], idx) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-slate-400 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                            <span className={`font-bold ${
+                              typeof value === 'string' && (value.includes('Passed') || value.includes('%')) 
+                                ? 'text-emerald-400'
+                                : typeof value === 'number' && key.toLowerCase().includes('bug')
+                                  ? 'text-red-400'
+                                  : 'text-white'
+                            }`}>
+                              {value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <button className={`w-full px-3 py-2 ${colors.bg} text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors`}>
+                        {tool.id === 'jira' ? (
+                          <Link href="/projects">Manage Projects</Link>
+                        ) : (
+                          `View ${tool.name}`
+                        )}
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
           {/* Enterprise Team Panel */}
           <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-xl">
             <div className="flex items-center justify-between mb-6">
@@ -491,9 +631,9 @@ export default function EnterpriseDashboard() {
                 <span className="mr-3">⚽</span>
                 Enterprise Team
               </h2>
-              <Link href="/">
+              <Link href="/workspace">
                 <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg font-medium hover:from-blue-700 hover:to-cyan-600 transition-all shadow-lg transform hover:scale-105">
-                  Open Workspace →
+                  Open AI Workspace →
                 </button>
               </Link>
             </div>
