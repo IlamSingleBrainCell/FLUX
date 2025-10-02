@@ -85,19 +85,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (groqApiKey) {
         try {
-          const { Groq } = await import('groq-sdk');
-          const client = new Groq({ apiKey: groqApiKey });
-
-          const chatCompletion = await client.chat.completions.create({
-            messages: [
-              { role: 'system', content: agent.prompt },
-              { role: 'user', content: message }
-            ],
-            model: 'llama3-8b-8192',
-            max_tokens: 200
+          // Direct HTTP request to Groq API
+          const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${groqApiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              messages: [
+                { role: 'system', content: agent.prompt },
+                { role: 'user', content: message }
+              ],
+              model: 'llama3-8b-8192',
+              max_tokens: 200
+            })
           });
 
-          const aiResponse = chatCompletion.choices[0]?.message?.content || 'No response generated';
+          if (!response.ok) {
+            throw new Error(`Groq API returned ${response.status}: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          const aiResponse = data.choices?.[0]?.message?.content || 'No response generated';
 
           res.status(200).json({
             responses: [{
