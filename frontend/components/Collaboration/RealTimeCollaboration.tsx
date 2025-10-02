@@ -189,7 +189,7 @@ export default function RealTimeCollaboration({ roomId, currentUserId }: Collabo
         user.cursor && user.id !== currentUserId && (
           <div
             key={`cursor-${user.id}`}
-            ref={el => cursorsRef.current[user.id] = el}
+            ref={(el) => { cursorsRef.current[user.id] = el; }}
             className="fixed pointer-events-none z-50 transition-transform duration-75"
             style={{
               transform: `translate(${user.cursor.x}px, ${user.cursor.y}px)`,
