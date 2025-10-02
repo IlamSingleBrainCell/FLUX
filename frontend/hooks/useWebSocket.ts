@@ -33,20 +33,28 @@ export const useWebSocket = (sessionId: string): UseWebSocketReturn => {
   const manualCloseRef = useRef(false);
 
   const buildUrl = () => {
+    // In production serverless, disable WebSocket (use REST API fallback)
+    if (process.env.NODE_ENV === 'production') {
+      return null; // Force REST API fallback
+    }
+    // Development: use WebSocket
     if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_WS_URL) {
       return `${process.env.NEXT_PUBLIC_WS_URL}/ws/${sessionId}`;
     }
-    return process.env.NODE_ENV === 'production'
-      ? `wss://${window.location.host}/api/ws/${sessionId}`
-      : `ws://localhost:8000/ws/${sessionId}`;
+    return `ws://localhost:8000/ws/${sessionId}`;
   };
 
   const getApiUrl = () => {
+    // Use environment variable from Vercel dashboard first
+    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_BACKEND_URL) {
+      return process.env.NEXT_PUBLIC_BACKEND_URL;
+    }
+    // Fallback to configured API URL
     if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_API_URL) {
       return process.env.NEXT_PUBLIC_API_URL;
     }
     return process.env.NODE_ENV === 'production'
-      ? `/api`
+      ? `https://flux-six-drab.vercel.app/api`
       : `http://localhost:8000`;
   };
 
@@ -120,6 +128,23 @@ export const useWebSocket = (sessionId: string): UseWebSocketReturn => {
     setConnectionStatus('connecting');
     setLastError(undefined);
 
+    const url = buildUrl();
+    
+    // If no WebSocket URL (serverless), use REST API only
+    if (!url) {
+      setConnectionStatus('connected'); // Fake connection for REST API mode
+      setActiveAgents([
+        'requirements_analyst',
+        'software_architect', 
+        'developer',
+        'qa_tester',
+        'devops_engineer',
+        'project_manager',
+        'security_expert'
+      ]);
+      return;
+    }
+
     // Ensure backend is up before opening socket (avoid instant close)
     const healthy = await healthCheck();
     if (!healthy) {
@@ -128,7 +153,6 @@ export const useWebSocket = (sessionId: string): UseWebSocketReturn => {
       return;
     }
 
-    const url = buildUrl();
     try {
       ws.current = new WebSocket(url);
     } catch (e: any) {
