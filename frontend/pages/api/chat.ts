@@ -95,24 +95,41 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (groqApiKey && groqApiKey.length > 10) {
         try {
           // Direct HTTP request to Groq API
+          const requestBody = {
+            messages: [
+              { role: 'system', content: agent.prompt },
+              { role: 'user', content: message }
+            ],
+            model: 'llama3-8b-8192',
+            max_tokens: 200,
+            temperature: 0.7
+          };
+          
+          console.log('Groq API Request:', {
+            url: 'https://api.groq.com/openai/v1/chat/completions',
+            hasAuth: !!groqApiKey,
+            keyPrefix: groqApiKey?.substring(0, 10),
+            model: requestBody.model,
+            messageCount: requestBody.messages.length
+          });
+
           const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${groqApiKey}`,
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              messages: [
-                { role: 'system', content: agent.prompt },
-                { role: 'user', content: message }
-              ],
-              model: 'llama3-8b-8192',
-              max_tokens: 200
-            })
+            body: JSON.stringify(requestBody)
           });
 
           if (!response.ok) {
-            throw new Error(`Groq API returned ${response.status}: ${response.statusText}`);
+            const errorText = await response.text();
+            console.error('Groq API Error Response:', {
+              status: response.status,
+              statusText: response.statusText,
+              body: errorText
+            });
+            throw new Error(`Groq API returned ${response.status}: ${response.statusText} - ${errorText}`);
           }
 
           const data = await response.json();
