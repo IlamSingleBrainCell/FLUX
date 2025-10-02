@@ -351,12 +351,171 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
                   {/* Messages Area - Claude Style */}
                   <div className="flex-1 overflow-y-auto">
                     {messages.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                        <svg className="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                        <p className="text-lg font-medium text-gray-400">No messages yet</p>
-                        <p className="text-sm text-gray-400">Start a conversation with the SDLC team</p>
+                      <div className="flex flex-col items-center justify-center h-full px-8 py-6">
+                        {/* Welcome Header */}
+                        <div className="text-center mb-8">
+                          <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                          </div>
+                          <h2 className="text-2xl font-bold text-slate-900 mb-2">Welcome to FLUX Enterprise</h2>
+                          <p className="text-base text-slate-600 max-w-2xl">
+                            Your AI-Powered Multi-Agent SDLC Platform
+                          </p>
+                        </div>
+
+                        {/* Purpose Description */}
+                        <div className="w-full max-w-3xl mb-8">
+                          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 shadow-sm">
+                            <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center">
+                              <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              What is FLUX Enterprise?
+                            </h3>
+                            <p className="text-slate-700 leading-relaxed">
+                              FLUX is an intelligent enterprise platform that brings together <strong>7 specialized AI agents</strong> to collaborate on your software development lifecycle. 
+                              Each agent has unique expertise - from requirements analysis to security - working together to deliver production-ready solutions.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Quick Start Examples */}
+                        <div className="w-full max-w-3xl mb-6">
+                          <h3 className="text-sm font-bold text-slate-700 mb-3 flex items-center uppercase tracking-wide">
+                            <svg className="w-4 h-4 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                            Try These Examples:
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <button
+                              onClick={() => setCurrentMessage("I need to build a REST API for user authentication with JWT tokens. Can you help me design and implement this?")}
+                              className="text-left p-4 bg-white rounded-lg border-2 border-slate-200 hover:border-blue-400 hover:shadow-md transition-all group"
+                            >
+                              <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                                  <span className="text-lg">🔐</span>
+                                </div>
+                                <div>
+                                  <div className="font-semibold text-slate-900 text-sm mb-1">Build Authentication API</div>
+                                  <div className="text-xs text-slate-500">Design and implement secure user auth with JWT</div>
+                                </div>
+                              </div>
+                            </button>
+
+                            <button
+                              onClick={() => setCurrentMessage("Create a CI/CD pipeline for a Node.js application with automated testing and deployment to AWS.")}
+                              className="text-left p-4 bg-white rounded-lg border-2 border-slate-200 hover:border-emerald-400 hover:shadow-md transition-all group"
+                            >
+                              <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-200 transition-colors">
+                                  <span className="text-lg">🚀</span>
+                                </div>
+                                <div>
+                                  <div className="font-semibold text-slate-900 text-sm mb-1">Setup CI/CD Pipeline</div>
+                                  <div className="text-xs text-slate-500">Automate testing and deployment to cloud</div>
+                                </div>
+                              </div>
+                            </button>
+
+                            <button
+                              onClick={() => setCurrentMessage("I want to migrate my monolithic application to microservices architecture. What's the best approach?")}
+                              className="text-left p-4 bg-white rounded-lg border-2 border-slate-200 hover:border-purple-400 hover:shadow-md transition-all group"
+                            >
+                              <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-purple-200 transition-colors">
+                                  <span className="text-lg">🏗️</span>
+                                </div>
+                                <div>
+                                  <div className="font-semibold text-slate-900 text-sm mb-1">Microservices Migration</div>
+                                  <div className="text-xs text-slate-500">Architect scalable distributed systems</div>
+                                </div>
+                              </div>
+                            </button>
+
+                            <button
+                              onClick={() => setCurrentMessage("Review my application for security vulnerabilities and suggest improvements for OWASP compliance.")}
+                              className="text-left p-4 bg-white rounded-lg border-2 border-slate-200 hover:border-red-400 hover:shadow-md transition-all group"
+                            >
+                              <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-red-200 transition-colors">
+                                  <span className="text-lg">🔒</span>
+                                </div>
+                                <div>
+                                  <div className="font-semibold text-slate-900 text-sm mb-1">Security Audit</div>
+                                  <div className="text-xs text-slate-500">OWASP compliance and vulnerability assessment</div>
+                                </div>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Features Grid */}
+                        <div className="w-full max-w-3xl">
+                          <h3 className="text-sm font-bold text-slate-700 mb-3 flex items-center uppercase tracking-wide">
+                            <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                            Key Capabilities:
+                          </h3>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                            <div className="p-3 bg-white rounded-lg border border-slate-200">
+                              <div className="text-2xl mb-1">📋</div>
+                              <div className="text-xs font-semibold text-slate-700">Requirements</div>
+                              <div className="text-xs text-slate-500">Analysis</div>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-slate-200">
+                              <div className="text-2xl mb-1">🏗️</div>
+                              <div className="text-xs font-semibold text-slate-700">Architecture</div>
+                              <div className="text-xs text-slate-500">Design</div>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-slate-200">
+                              <div className="text-2xl mb-1">💻</div>
+                              <div className="text-xs font-semibold text-slate-700">Development</div>
+                              <div className="text-xs text-slate-500">Coding</div>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-slate-200">
+                              <div className="text-2xl mb-1">🧪</div>
+                              <div className="text-xs font-semibold text-slate-700">Testing</div>
+                              <div className="text-xs text-slate-500">QA</div>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-slate-200">
+                              <div className="text-2xl mb-1">🚀</div>
+                              <div className="text-xs font-semibold text-slate-700">Deployment</div>
+                              <div className="text-xs text-slate-500">DevOps</div>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-slate-200">
+                              <div className="text-2xl mb-1">🔒</div>
+                              <div className="text-xs font-semibold text-slate-700">Security</div>
+                              <div className="text-xs text-slate-500">Audit</div>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-slate-200">
+                              <div className="text-2xl mb-1">📊</div>
+                              <div className="text-xs font-semibold text-slate-700">Project</div>
+                              <div className="text-xs text-slate-500">Management</div>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-slate-200">
+                              <div className="text-2xl mb-1">🔗</div>
+                              <div className="text-xs font-semibold text-slate-700">Integration</div>
+                              <div className="text-xs text-slate-500">GitHub/JIRA</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* CTA */}
+                        <div className="mt-8 text-center">
+                          <p className="text-sm text-slate-500 mb-3">
+                            👆 Select team members above and start your first conversation
+                          </p>
+                          <div className="flex items-center justify-center space-x-2 text-xs text-slate-400">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <span>Powered by Groq AI & Enterprise MCP Protocol</span>
+                          </div>
+                        </div>
                       </div>
                     ) : (
                       <div className="space-y-0">
