@@ -53,6 +53,7 @@ export default function UnifiedNav({ currentPage, showNotifications = true }: Un
     { id: 'marketplace', label: 'Marketplace', icon: '🛒', href: '/marketplace' },
     { id: 'timeline', label: 'Timeline', icon: '⏰', href: '/timeline' },
     { id: 'workflows', label: 'Workflows', icon: '🔄', href: '/workflows' },
+    { id: 'onboarding', label: 'Help', icon: '👋', href: '/onboarding' },
     { id: 'settings', label: 'Settings', icon: '⚙️', href: '/settings' },
   ];
 
@@ -93,6 +94,7 @@ export default function UnifiedNav({ currentPage, showNotifications = true }: Un
       case 'marketplace': return 'from-rose-600 to-pink-500';
       case 'timeline': return 'from-violet-600 to-purple-500';
       case 'workflows': return 'from-teal-500 to-cyan-500';
+      case 'onboarding': return 'from-yellow-500 to-orange-500';
       case 'settings': return 'from-indigo-600 to-purple-500';
       default: return 'from-blue-600 to-cyan-500';
     }
