@@ -1,40 +1,22 @@
 {
   "version": 2,
   "name": "flux-multi-agent",
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/next"
-    },
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/.next",
+  "installCommand": "cd frontend && npm install",
+  "framework": "nextjs",
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.9"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/health",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/chat",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/agents",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
     }
   ],
   "env": {
-    "GROQ_API_KEY": "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",
     "NODE_ENV": "production"
   }
 }

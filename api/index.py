@@ -27,6 +27,8 @@ class handler(BaseHTTPRequestHandler):
             try:
                 from groq import Groq
                 groq_client = Groq(api_key=groq_api_key)
+            except ImportError:
+                groq_client = None
             except Exception as e:
                 groq_client = None
         
@@ -91,14 +93,52 @@ class handler(BaseHTTPRequestHandler):
             request_data = json.loads(post_data.decode())
             message = request_data.get('message', '')
             
-            response_data = {
-                "message": "Chat endpoint working",
-                "received_message": message,
-                "agent": "Sara (System)",
-                "response": f"Hello! I received your message: '{message}'. The GROQ API integration is being set up.",
-                "timestamp": "2025-10-01T00:00:00Z",
-                "groq_configured": os.environ.get("GROQ_API_KEY") is not None
-            }
+            # Simple chat response for demo
+            groq_api_key = os.environ.get("GROQ_API_KEY")
+            
+            if groq_api_key and message:
+                try:
+                    from groq import Groq
+                    client = Groq(api_key=groq_api_key)
+                    
+                    chat_completion = client.chat.completions.create(
+                        messages=[
+                            {"role": "system", "content": "You are Sara, a helpful Requirements Analyst. Respond briefly and professionally."},
+                            {"role": "user", "content": message}
+                        ],
+                        model="llama3-8b-8192",
+                        max_tokens=150
+                    )
+                    
+                    ai_response = chat_completion.choices[0].message.content
+                    
+                    response_data = {
+                        "responses": [{
+                            "agent": "requirements_analyst",
+                            "message": ai_response,
+                            "timestamp": "2025-10-02T00:00:00Z"
+                        }],
+                        "groq_configured": True
+                    }
+                except Exception as e:
+                    response_data = {
+                        "responses": [{
+                            "agent": "requirements_analyst", 
+                            "message": f"Hello! I received your message: '{message}'. GROQ API integration is working but encountered an error: {str(e)}",
+                            "timestamp": "2025-10-02T00:00:00Z"
+                        }],
+                        "groq_configured": True,
+                        "error": str(e)
+                    }
+            else:
+                response_data = {
+                    "responses": [{
+                        "agent": "requirements_analyst",
+                        "message": f"Hello! I received your message: '{message}'. GROQ API key is not configured in Vercel environment.",
+                        "timestamp": "2025-10-02T00:00:00Z"
+                    }],
+                    "groq_configured": False
+                }
             
             self.wfile.write(json.dumps(response_data, indent=2).encode())
             
