@@ -3,23 +3,5 @@
     "api/index.py": {
       "runtime": "python3.9"
     }
-  },
-  "routes": [
-    {
-      "src": "/api/health",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/api/agents",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/api/chat",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/api",
-      "dest": "/api/index.py"
-    }
-  ]
+  }
 }
