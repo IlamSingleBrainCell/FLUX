@@ -419,24 +419,30 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
                 </div>
               </div>
 
-              {/* Message Input - Claude Style */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              {/* Enhanced Message Input - Professional Design */}
+              <div className="bg-gradient-to-br from-white via-slate-50 to-white rounded-2xl shadow-2xl border-2 border-slate-200">
                 {/* Selected Recipients Bar */}
                 {selectedAgents.length > 0 && (
-                  <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="text-xs text-gray-500 font-medium">Messaging:</span>
+                  <div className="px-5 py-4 border-b-2 border-slate-200 bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                      </div>
+                      <span className="text-sm text-slate-700 font-bold">Collaborating with:</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {selectedAgents.map(agentId => (
                         <span
                           key={agentId}
-                          className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded-md font-medium"
+                          className="inline-flex items-center px-3 py-2 bg-white border-2 border-blue-300 text-blue-700 text-sm rounded-xl font-bold shadow-sm hover:shadow-md transition-all"
                         >
+                          <span className="mr-2">⚽</span>
                           {getAgentDisplayName(agentId)}
                           <button
                             onClick={() => setSelectedAgents(prev => prev.filter(id => id !== agentId))}
-                            className="ml-1 text-blue-500/60 hover:text-blue-500 transition-colors"
+                            className="ml-2 text-blue-500/60 hover:text-red-600 transition-colors p-1 hover:bg-red-100 rounded"
                           >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -449,20 +455,35 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
                 )}
 
                 {/* Main Input Area */}
-                <div className="p-4">
+                <div className="p-5">
                   {/* Upload Status */}
                   {uploadedFiles.length > 0 && (
-                    <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="flex items-center space-x-2">
-                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                        </svg>
-                        <span className="text-sm text-blue-700 font-medium">{uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''} attached</span>
+                    <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-300 shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="text-sm text-blue-900 font-bold">
+                              {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''} attached
+                            </div>
+                            <div className="text-xs text-blue-600">Ready to analyze</div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setUploadedFiles([])}
+                          className="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-xs font-bold hover:bg-red-200 transition-colors"
+                        >
+                          Clear all
+                        </button>
                       </div>
                     </div>
                   )}
 
-                  {/* Message Input - Claude Style */}
+                  {/* Enhanced Message Input */}
                   <div className="relative">
                     <textarea
                       ref={textareaRef}
@@ -470,71 +491,104 @@ export const EnhancedChatInterface: React.FC<EnhancedChatInterfaceProps> = ({
                       onChange={handleTextareaChange}
                       onKeyPress={handleKeyPress}
                       placeholder={selectedAgents.length > 0 
-                        ? `Message ${selectedAgents.map(getAgentDisplayName).join(', ')}...`
-                        : "Ask a question, start a discussion, or request help from the SDLC team..."
+                        ? `💬 Message ${selectedAgents.map(getAgentDisplayName).join(', ')}...`
+                        : "💡 Ask a question, start a discussion, or request help from the SDLC team..."
                       }
-                      className="w-full p-4 pr-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all duration-200 bg-white hover:border-gray-400 placeholder-gray-400 text-gray-900"
-                      style={{ minHeight: '60px', maxHeight: '200px' }}
+                      className="w-full p-5 pr-20 border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 resize-none transition-all duration-200 bg-white hover:border-blue-300 placeholder-slate-400 text-slate-900 font-medium shadow-sm"
+                      style={{ minHeight: '80px', maxHeight: '240px' }}
                     />
                     
-                    {/* Send Button */}
-                    <div className="absolute right-3 bottom-3 flex items-center space-x-2">
+                    {/* Enhanced Send Button */}
+                    <div className="absolute right-4 bottom-4 flex items-center space-x-3">
                       {currentMessage.length > 0 && (
-                        <span className="text-xs text-gray-400">{currentMessage.length}/2000</span>
+                        <div className="flex flex-col items-end">
+                          <span className={`text-xs font-bold ${currentMessage.length > 1800 ? 'text-red-600' : 'text-slate-500'}`}>
+                            {currentMessage.length}/2000
+                          </span>
+                          {currentMessage.length > 1800 && (
+                            <span className="text-xs text-red-500">Near limit!</span>
+                          )}
+                        </div>
                       )}
                       <button
                         onClick={handleSendMessage}
                         disabled={!currentMessage.trim() && uploadedFiles.length === 0}
-                        className="inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 transition-colors"
-                        title="Send message"
+                        className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl hover:from-blue-700 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:hover:scale-100"
+                        title="Send message (Ctrl + Enter)"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
                       </button>
                     </div>
                   </div>
 
-                  {/* Quick Actions Bar */}
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
+                  {/* Enhanced Quick Actions Bar */}
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t-2 border-slate-200">
                     <div className="flex items-center space-x-2">
+                      {/* Attach Button */}
                       <button
                         onClick={() => setActiveTab('documents')}
-                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 bg-gray-100 hover:bg-blue-50 rounded-md border border-gray-200 hover:border-blue-200 transition-all duration-200"
+                        className="inline-flex items-center px-4 py-2 text-sm font-bold text-slate-700 hover:text-blue-600 bg-slate-100 hover:bg-blue-100 rounded-xl border-2 border-slate-200 hover:border-blue-300 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
                       >
-                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                         </svg>
-                        Attach
+                        Attach Files
                       </button>
+                      
+                      {/* Workflow Button */}
                       <button
                         onClick={() => setActiveTab('workflow')}
-                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 bg-gray-100 hover:bg-blue-50 rounded-md border border-gray-200 hover:border-blue-200 transition-all duration-200"
+                        className="inline-flex items-center px-4 py-2 text-sm font-bold text-slate-700 hover:text-purple-600 bg-slate-100 hover:bg-purple-100 rounded-xl border-2 border-slate-200 hover:border-purple-300 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
                       >
-                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                         Workflow
                       </button>
+                      
+                      {/* GitHub Integration */}
+                      <button
+                        onClick={() => setActiveTab('github')}
+                        className="inline-flex items-center px-4 py-2 text-sm font-bold text-slate-700 hover:text-emerald-600 bg-slate-100 hover:bg-emerald-100 rounded-xl border-2 border-slate-200 hover:border-emerald-300 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                      </button>
+                      
+                      {/* History Button */}
                       <button
                         onClick={() => setActiveTab('history')}
-                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 bg-gray-100 hover:bg-blue-50 rounded-md border border-gray-200 hover:border-blue-200 transition-all duration-200"
+                        className="inline-flex items-center px-4 py-2 text-sm font-bold text-slate-700 hover:text-orange-600 bg-slate-100 hover:bg-orange-100 rounded-xl border-2 border-slate-200 hover:border-orange-300 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
                       >
-                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         History
                       </button>
                     </div>
                     
-                    <div className="flex items-center space-x-3 text-xs text-gray-500">
-                      <span>{messages.length} messages</span>
+                    {/* Session Stats */}
+                    <div className="flex items-center space-x-4 text-xs">
+                      <div className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
+                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span className="font-bold text-slate-700">{messages.length} messages</span>
+                      </div>
                       {currentPhase && (
-                        <>
-                          <span>•</span>
-                          <span className="capitalize">{currentPhase.replace('_', ' ')}</span>
-                        </>
+                        <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                          <span className="font-bold text-slate-700 capitalize">
+                            {currentPhase.replace('_', ' ')}
+                          </span>
+                        </div>
                       )}
+                      <div className="px-3 py-2 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg border border-emerald-200">
+                        <span className="font-bold text-slate-700">
+                          {activeAgents.length} agents online
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
