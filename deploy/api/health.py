@@ -56,13 +56,11 @@ class handler(BaseHTTPRequestHandler):
             response_data.update({
                 "endpoint": "agents",
                 "agents": {
-                    "sara": {"name": "Sara (Requirements Analyst)", "status": "online"},
-                    "marc": {"name": "Marc (Software Architect)", "status": "online"},
-                    "alex": {"name": "Alex (Developer)", "status": "online"},
-                    "jess": {"name": "Jess (QA Tester)", "status": "online"},
-                    "dave": {"name": "Dave (DevOps Engineer)", "status": "online"},
-                    "emma": {"name": "Emma (Project Manager)", "status": "online"},
-                    "robt": {"name": "Robt (Security Expert)", "status": "online"}
+                    "messi": {"name": "Messi ⚽ (Requirements Analyst)", "status": "online"},
+                    "ronaldo": {"name": "Ronaldo ⚽ (Software Architect)", "status": "online"},
+                    "neymar": {"name": "Neymar ⚽ (Developer)", "status": "online"},
+                    "mbappe": {"name": "Mbappé ⚽ (QA Tester)", "status": "online"},
+                    "benzema": {"name": "Benzema ⚽ (DevOps Engineer)", "status": "online"}
                 }
             })
         else:
@@ -93,7 +91,7 @@ class handler(BaseHTTPRequestHandler):
             response_data = {
                 "message": "Chat endpoint working",
                 "received_message": message,
-                "agent": "Sara (System)",
+                "agent": "Messi ⚽ (System)",
                 "response": f"Hello! I received your message: '{message}'. The GROQ API integration is being set up.",
                 "timestamp": "2025-10-01T00:00:00Z",
                 "groq_configured": os.environ.get("GROQ_API_KEY") is not None

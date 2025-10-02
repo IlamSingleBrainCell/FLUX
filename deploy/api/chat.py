@@ -22,7 +22,7 @@ class handler(BaseHTTPRequestHandler):
             response_data = {
                 "message": "Chat endpoint working",
                 "received_message": message,
-                "agent": "Sara (System)",
+                "agent": "Messi ⚽ (System)",
                 "response": f"Hello! I received your message: '{message}'. The GROQ API integration is being set up.",
                 "timestamp": "2025-10-01T00:00:00Z",
                 "groq_configured": os.environ.get("GROQ_API_KEY") is not None

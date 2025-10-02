@@ -59,13 +59,11 @@ class handler(BaseHTTPRequestHandler):
             response_data.update({
                 "endpoint": "agents",
                 "agents": {
-                    "sara": {"name": "Sara (Requirements Analyst)", "status": "online"},
-                    "marc": {"name": "Marc (Software Architect)", "status": "online"},
-                    "alex": {"name": "Alex (Developer)", "status": "online"},
-                    "jess": {"name": "Jess (QA Tester)", "status": "online"},
-                    "dave": {"name": "Dave (DevOps Engineer)", "status": "online"},
-                    "emma": {"name": "Emma (Project Manager)", "status": "online"},
-                    "robt": {"name": "Robt (Security Expert)", "status": "online"}
+                    "messi": {"name": "Messi ⚽ (Requirements Analyst)", "status": "online"},
+                    "ronaldo": {"name": "Ronaldo ⚽ (Software Architect)", "status": "online"},
+                    "neymar": {"name": "Neymar ⚽ (Developer)", "status": "online"},
+                    "mbappe": {"name": "Mbappé ⚽ (QA Tester)", "status": "online"},
+                    "benzema": {"name": "Benzema ⚽ (DevOps Engineer)", "status": "online"}
                 }
             })
         else:
@@ -96,43 +94,35 @@ class handler(BaseHTTPRequestHandler):
             # Multi-agent chat system
             groq_api_key = os.environ.get("GROQ_API_KEY")
             
-            # Agent definitions
+            # Agent definitions - Football Team ⚽
             agents = {
-                "requirements_analyst": "You are Sara, a Requirements Analyst. Analyze project needs and document requirements clearly.",
-                "software_architect": "You are Marc, a Software Architect. Design system architecture and provide technical guidance.",
-                "developer": "You are Alex, a Senior Developer. Write code, solve technical problems, and implement features.",
-                "qa_tester": "You are Jess, a QA Engineer. Test software, find bugs, and ensure quality standards.",
-                "devops_engineer": "You are Dave, a DevOps Engineer. Handle deployment, infrastructure, and automation.", 
-                "project_manager": "You are Emma, a Project Manager. Coordinate teams, manage timelines, and track progress.",
-                "security_expert": "You are Robt, a Security Expert. Assess risks, implement security measures, and protect systems."
+                "requirements_analyst": "You are Messi ⚽, a Requirements Analyst. Analyze project needs and document requirements clearly.",
+                "software_architect": "You are Ronaldo ⚽, a Software Architect. Design system architecture and provide technical guidance.",
+                "developer": "You are Neymar ⚽, a Senior Developer. Write code, solve technical problems, and implement features.",
+                "qa_tester": "You are Mbappé ⚽, a QA Engineer. Test software, find bugs, and ensure quality standards.",
+                "devops_engineer": "You are Benzema ⚽, a DevOps Engineer. Handle deployment, infrastructure, and automation."
             }
             
             # Detect which agent to respond as based on message
             responding_agent = "requirements_analyst"  # default
-            agent_name = "Sara"
+            agent_name = "Messi ⚽"
             
             message_lower = message.lower()
-            if "marc" in message_lower or "architect" in message_lower:
+            if "ronaldo" in message_lower or "architect" in message_lower:
                 responding_agent = "software_architect"
-                agent_name = "Marc"
-            elif "alex" in message_lower or "developer" in message_lower:
+                agent_name = "Ronaldo ⚽"
+            elif "neymar" in message_lower or "developer" in message_lower:
                 responding_agent = "developer" 
-                agent_name = "Alex"
-            elif "jess" in message_lower or "qa" in message_lower or "test" in message_lower:
+                agent_name = "Neymar ⚽"
+            elif "mbappe" in message_lower or "mbappé" in message_lower or "qa" in message_lower or "test" in message_lower:
                 responding_agent = "qa_tester"
-                agent_name = "Jess"
-            elif "dave" in message_lower or "devops" in message_lower or "deploy" in message_lower:
+                agent_name = "Mbappé ⚽"
+            elif "benzema" in message_lower or "devops" in message_lower or "deploy" in message_lower:
                 responding_agent = "devops_engineer"
-                agent_name = "Dave"
-            elif "emma" in message_lower or "project" in message_lower or "manager" in message_lower:
-                responding_agent = "project_manager"
-                agent_name = "Emma"
-            elif "robt" in message_lower or "robot" in message_lower or "security" in message_lower:
-                responding_agent = "security_expert"
-                agent_name = "Robt"
-            elif "sara" in message_lower or "requirement" in message_lower:
+                agent_name = "Benzema ⚽"
+            elif "messi" in message_lower or "requirement" in message_lower:
                 responding_agent = "requirements_analyst"
-                agent_name = "Sara"
+                agent_name = "Messi ⚽"
             
             if groq_api_key and message:
                 try:
