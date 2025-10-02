@@ -44,9 +44,15 @@ export default function UnifiedNav({ currentPage, showNotifications = true }: Un
     { id: 'projects', label: 'Projects', icon: '📋', href: '/projects' },
     { id: 'workspace', label: 'AI Workspace', icon: '💬', href: '/workspace' },
     { id: 'analytics', label: 'Analytics', icon: '📈', href: '/analytics' },
+    { id: 'code-review', label: 'Code Review', icon: '🔍', href: '/code-review' },
+    { id: 'multi-project', label: 'Multi-Project', icon: '🗂️', href: '/multi-project' },
+    { id: 'agent-customization', label: 'Agents', icon: '🎨', href: '/agent-customization' },
     { id: 'integrations', label: 'Integrations', icon: '🔌', href: '/integrations' },
+    { id: 'templates', label: 'Templates', icon: '🎯', href: '/templates' },
+    { id: 'conversations', label: 'Conversations', icon: '💭', href: '/conversations' },
     { id: 'marketplace', label: 'Marketplace', icon: '🛒', href: '/marketplace' },
     { id: 'timeline', label: 'Timeline', icon: '⏰', href: '/timeline' },
+    { id: 'workflows', label: 'Workflows', icon: '🔄', href: '/workflows' },
     { id: 'settings', label: 'Settings', icon: '⚙️', href: '/settings' },
   ];
 
@@ -78,9 +84,15 @@ export default function UnifiedNav({ currentPage, showNotifications = true }: Un
       case 'projects': return 'from-emerald-600 to-teal-500';
       case 'workspace': return 'from-purple-600 to-pink-500';
       case 'analytics': return 'from-orange-600 to-red-500';
+      case 'code-review': return 'from-blue-500 to-purple-500';
+      case 'multi-project': return 'from-green-500 to-emerald-500';
+      case 'agent-customization': return 'from-pink-500 to-purple-500';
       case 'integrations': return 'from-cyan-600 to-blue-500';
+      case 'templates': return 'from-indigo-500 to-blue-500';
+      case 'conversations': return 'from-blue-400 to-indigo-500';
       case 'marketplace': return 'from-rose-600 to-pink-500';
       case 'timeline': return 'from-violet-600 to-purple-500';
+      case 'workflows': return 'from-teal-500 to-cyan-500';
       case 'settings': return 'from-indigo-600 to-purple-500';
       default: return 'from-blue-600 to-cyan-500';
     }

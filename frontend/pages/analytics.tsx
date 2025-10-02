@@ -1,7 +1,15 @@
-// Analytics Page - Deep Dive into Team Performance & Metrics
+// Analytics Page - Deep Dive into Team Performance & Metrics  
 import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useCommandPalette } from '../components/CommandPalette/CommandPalette';
+import { 
+  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  AreaChart, Area, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
+} from 'recharts';
+
+const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
 
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
