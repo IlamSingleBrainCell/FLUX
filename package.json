@@ -2,11 +2,8 @@
   "name": "flux-monorepo",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "frontend"
-  ],
   "scripts": {
-    "build": "npm --prefix frontend install && npm --prefix frontend run build",
-    "start": "npm --prefix frontend start"
+    "build": "echo 'Build handled by vercel.json buildCommand'",
+    "start": "echo 'Start not needed for Vercel deployment'"
   }
 }
