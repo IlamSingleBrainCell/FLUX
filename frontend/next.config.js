@@ -6,10 +6,10 @@ const nextConfig = {
   // Environment variables for production
   env: {
     NEXT_PUBLIC_API_URL: process.env.NODE_ENV === 'production' 
-      ? '/api' 
+      ? 'https://flux-six-drab.vercel.app/api' 
       : 'http://localhost:8000',
     NEXT_PUBLIC_WS_URL: process.env.NODE_ENV === 'production'
-      ? `wss://${process.env.VERCEL_URL || 'localhost'}/api`
+      ? ''
       : 'ws://localhost:8000',
   },
 

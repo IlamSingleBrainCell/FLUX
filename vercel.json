@@ -4,10 +4,22 @@
       "runtime": "python3.9"
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "src": "/api/health",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/api/agents",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/api/chat",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/api",
+      "dest": "/api/index.py"
     }
   ]
 }
