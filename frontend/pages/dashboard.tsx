@@ -1,9 +1,8 @@
-// Enterprise SDLC Dashboard - ENHANCED PROFESSIONAL VERSION
+// Enterprise SDLC Dashboard - ULTRA ENHANCED VERSION
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { enterpriseAgents } from '../config/agents';
-import { useToolsStatus } from '../hooks/useToolsStatus';
 
 interface MetricCard {
   title: string;
@@ -13,18 +12,7 @@ interface MetricCard {
   icon: string;
   color: string;
   bgGradient: string;
-}
-
-interface Sprint {
-  id: string;
-  name: string;
-  status: 'active' | 'planning' | 'completed';
-  progress: number;
-  stories: number;
-  velocity: number;
-  startDate: string;
-  endDate: string;
-  team: string[];
+  details?: { label: string; value: string }[];
 }
 
 interface Activity {
@@ -35,6 +23,7 @@ interface Activity {
   target: string;
   time: string;
   type: 'commit' | 'review' | 'deploy' | 'test' | 'story' | 'bug';
+  details?: string;
 }
 
 interface ChartData {
@@ -44,7 +33,29 @@ interface ChartData {
   planned: number;
 }
 
+interface Notification {
+  id: string;
+  type: 'success' | 'warning' | 'error' | 'info';
+  title: string;
+  message: string;
+  time: string;
+  read: boolean;
+}
+
 export default function EnterpriseDashboard() {
+  const [dateRange, setDateRange] = useState<'today' | 'week' | 'month' | 'quarter'>('week');
+  const [selectedMetric, setSelectedMetric] = useState<MetricCard | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  const [notifications, setNotifications] = useState<Notification[]>([
+    { id: '1', type: 'error', title: 'Build Failed', message: 'Production build failed on staging', time: '2 min ago', read: false },
+    { id: '2', type: 'success', title: 'Deployment Success', message: 'v2.3.1 deployed to production', time: '12 min ago', read: false },
+    { id: '3', type: 'warning', title: 'Security Alert', message: 'CVE-2024-001 detected in dependencies', time: '32 min ago', read: true },
+    { id: '4', type: 'info', title: 'Code Review', message: '3 PRs waiting for review', time: '1 hour ago', read: true },
+  ]);
+
   const [metrics, setMetrics] = useState<MetricCard[]>([
     { 
       title: 'Active Sprints', 
@@ -53,7 +64,13 @@ export default function EnterpriseDashboard() {
       trend: 'up', 
       icon: '🏃',
       color: 'blue',
-      bgGradient: 'from-blue-500 to-cyan-500'
+      bgGradient: 'from-blue-500 to-cyan-500',
+      details: [
+        { label: 'In Progress', value: '1 sprint' },
+        { label: 'Planning', value: '1 sprint' },
+        { label: 'Avg Stories', value: '10 stories' },
+        { label: 'Team Size', value: '7 members' }
+      ]
     },
     { 
       title: 'Team Velocity', 
@@ -62,7 +79,13 @@ export default function EnterpriseDashboard() {
       trend: 'up', 
       icon: '⚡',
       color: 'yellow',
-      bgGradient: 'from-yellow-500 to-orange-500'
+      bgGradient: 'from-yellow-500 to-orange-500',
+      details: [
+        { label: 'Current Sprint', value: '23.5 points/day' },
+        { label: 'Last Sprint', value: '21.0 points/day' },
+        { label: 'Best Sprint', value: '28.3 points/day' },
+        { label: 'Improvement', value: '+12%' }
+      ]
     },
     { 
       title: 'Story Points', 
@@ -71,7 +94,13 @@ export default function EnterpriseDashboard() {
       trend: 'neutral', 
       icon: '📊',
       color: 'purple',
-      bgGradient: 'from-purple-500 to-pink-500'
+      bgGradient: 'from-purple-500 to-pink-500',
+      details: [
+        { label: 'Completed', value: '47 points' },
+        { label: 'In Progress', value: '28 points' },
+        { label: 'Remaining', value: '15 points' },
+        { label: 'Total Sprint', value: '90 points' }
+      ]
     },
     { 
       title: 'Code Quality', 
@@ -80,7 +109,13 @@ export default function EnterpriseDashboard() {
       trend: 'up', 
       icon: '✨',
       color: 'green',
-      bgGradient: 'from-green-500 to-emerald-500'
+      bgGradient: 'from-green-500 to-emerald-500',
+      details: [
+        { label: 'Maintainability', value: 'A+' },
+        { label: 'Complexity', value: 'Low' },
+        { label: 'Duplication', value: '2.1%' },
+        { label: 'Tech Debt', value: '3.2 days' }
+      ]
     },
     { 
       title: 'Test Coverage', 
@@ -89,7 +124,13 @@ export default function EnterpriseDashboard() {
       trend: 'up', 
       icon: '🧪',
       color: 'indigo',
-      bgGradient: 'from-indigo-500 to-purple-500'
+      bgGradient: 'from-indigo-500 to-purple-500',
+      details: [
+        { label: 'Unit Tests', value: '92%' },
+        { label: 'Integration', value: '85%' },
+        { label: 'E2E Tests', value: '78%' },
+        { label: 'Total Suites', value: '1,247 tests' }
+      ]
     },
     { 
       title: 'Deployments', 
@@ -98,44 +139,23 @@ export default function EnterpriseDashboard() {
       trend: 'neutral', 
       icon: '🚀',
       color: 'red',
-      bgGradient: 'from-red-500 to-rose-500'
-    },
-  ]);
-
-  const [sprints, setSprints] = useState<Sprint[]>([
-    { 
-      id: '1', 
-      name: 'Sprint 24 - Mobile Payment Integration', 
-      status: 'active', 
-      progress: 65, 
-      stories: 12, 
-      velocity: 25,
-      startDate: '2025-03-15',
-      endDate: '2025-03-29',
-      team: ['Messi', 'Ronaldo', 'Neymar', 'Benzema']
-    },
-    { 
-      id: '2', 
-      name: 'Sprint 25 - Dashboard Redesign & Analytics', 
-      status: 'planning', 
-      progress: 15, 
-      stories: 8, 
-      velocity: 0,
-      startDate: '2025-03-30',
-      endDate: '2025-04-13',
-      team: ['Mbappé', 'Modric', 'Ramos']
+      bgGradient: 'from-red-500 to-rose-500',
+      details: [
+        { label: 'Production', value: '4 deploys' },
+        { label: 'Staging', value: '8 deploys' },
+        { label: 'Success Rate', value: '100%' },
+        { label: 'Avg Duration', value: '4.2 min' }
+      ]
     },
   ]);
 
   const [recentActivities, setRecentActivities] = useState<Activity[]>([
-    { id: '1', agent: 'developer', agentName: 'Neymar', action: 'Committed', target: 'Payment Gateway API', time: '2 min ago', type: 'commit' },
-    { id: '2', agent: 'qa_tester', agentName: 'Mbappé', action: 'Reviewed', target: 'User Authentication Tests', time: '5 min ago', type: 'review' },
-    { id: '3', agent: 'devops_engineer', agentName: 'Benzema', action: 'Deployed', target: 'Production v2.3.1', time: '12 min ago', type: 'deploy' },
-    { id: '4', agent: 'requirements_analyst', agentName: 'Messi', action: 'Created', target: 'US-2401: Mobile Checkout', time: '18 min ago', type: 'story' },
-    { id: '5', agent: 'software_architect', agentName: 'Ronaldo', action: 'Designed', target: 'Microservices Architecture', time: '25 min ago', type: 'review' },
-    { id: '6', agent: 'security_expert', agentName: 'Ramos', action: 'Fixed', target: 'Security Vulnerability CVE-2024-001', time: '32 min ago', type: 'bug' },
-    { id: '7', agent: 'project_manager', agentName: 'Modric', action: 'Planned', target: 'Sprint 25 Kickoff', time: '45 min ago', type: 'story' },
-    { id: '8', agent: 'qa_tester', agentName: 'Mbappé', action: 'Executed', target: '245 Automated Tests', time: '1 hour ago', type: 'test' },
+    { id: '1', agent: 'developer', agentName: 'Neymar', action: 'Committed', target: 'Payment Gateway API', time: '2 min ago', type: 'commit', details: 'Added OAuth2 integration with 245 lines' },
+    { id: '2', agent: 'qa_tester', agentName: 'Mbappé', action: 'Reviewed', target: 'User Authentication Tests', time: '5 min ago', type: 'review', details: 'Approved with 2 suggestions' },
+    { id: '3', agent: 'devops_engineer', agentName: 'Benzema', action: 'Deployed', target: 'Production v2.3.1', time: '12 min ago', type: 'deploy', details: 'Zero-downtime deployment successful' },
+    { id: '4', agent: 'requirements_analyst', agentName: 'Messi', action: 'Created', target: 'US-2401: Mobile Checkout', time: '18 min ago', type: 'story', details: '8 story points, High priority' },
+    { id: '5', agent: 'software_architect', agentName: 'Ronaldo', action: 'Designed', target: 'Microservices Architecture', time: '25 min ago', type: 'review', details: 'API Gateway + 6 services' },
+    { id: '6', agent: 'security_expert', agentName: 'Ramos', action: 'Fixed', target: 'Security Vulnerability CVE-2024-001', time: '32 min ago', type: 'bug', details: 'Critical severity resolved' },
   ]);
 
   const [velocityData] = useState<ChartData[]>([
@@ -146,540 +166,425 @@ export default function EnterpriseDashboard() {
     { day: 'Fri', velocity: 28, completed: 26, planned: 28 },
   ]);
 
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected'>('connected');
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Real-time tools status integration
-  const { tools, loading: toolsLoading, error: toolsError } = useToolsStatus(30000);
+  const [teamPerformance] = useState([
+    { agent: 'Neymar', role: 'Developer', tasks: 24, velocity: 28.5, quality: 96, commits: 45 },
+    { agent: 'Messi', role: 'Requirements Analyst', tasks: 18, velocity: 22.0, quality: 94, commits: 12 },
+    { agent: 'Ronaldo', role: 'Software Architect', tasks: 15, velocity: 25.3, quality: 98, commits: 8 },
+    { agent: 'Mbappé', role: 'QA Tester', tasks: 32, velocity: 18.7, quality: 92, commits: 28 },
+    { agent: 'Benzema', role: 'DevOps Engineer', tasks: 20, velocity: 21.5, quality: 95, commits: 35 },
+  ]);
 
   useEffect(() => {
-    const loadActivity = async () => {
-      try {
-        const response = await fetch('/api/health');
-        const data = await response.json();
-        setConnectionStatus(data.status === 'healthy' ? 'connected' : 'disconnected');
-      } catch (error) {
-        setConnectionStatus('disconnected');
-      }
-    };
-
-    loadActivity();
-    const healthInterval = setInterval(loadActivity, 30000);
-    const timeInterval = setInterval(() => setCurrentTime(new Date()), 1000);
-    
-    return () => {
-      clearInterval(healthInterval);
-      clearInterval(timeInterval);
-    };
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
   }, []);
 
-  const getActivityIcon = (type: string) => {
-    const icons = {
-      commit: '📝',
-      review: '👀',
-      deploy: '🚀',
-      test: '🧪',
-      story: '📋',
-      bug: '🐛'
-    };
-    return icons[type as keyof typeof icons] || '📌';
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const exportReport = (format: 'pdf' | 'excel' | 'csv') => {
+    alert(`Exporting report as ${format.toUpperCase()}... (Demo)`);
+    setShowExportModal(false);
   };
 
-  const getActivityColor = (type: string) => {
-    const colors = {
-      commit: 'bg-blue-100 text-blue-700 border-blue-200',
-      review: 'bg-purple-100 text-purple-700 border-purple-200',
-      deploy: 'bg-green-100 text-green-700 border-green-200',
-      test: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      story: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-      bug: 'bg-red-100 text-red-700 border-red-200'
-    };
-    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-700 border-gray-200';
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
   return (
     <>
       <Head>
-        <title>Enterprise SDLC Dashboard | FLUX</title>
-        <meta name="description" content="Enterprise Multi-Agent SDLC Platform" />
+        <title>Enterprise Dashboard - FLUX</title>
+        <meta name="description" content="Comprehensive SDLC metrics and analytics" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        {/* Professional Header */}
-        <header className="bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50 shadow-2xl">
-          <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        {/* Enhanced Header with Notifications */}
+        <div className="bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50 shadow-2xl">
+          <div className="max-w-[1800px] mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-xl shadow-lg">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-white">FLUX Enterprise</h1>
+                  <h1 className="text-xl font-bold text-white">FLUX Enterprise</h1>
                   <p className="text-sm text-slate-400">Multi-Agent SDLC Platform</p>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
-                {/* Live Clock */}
-                <div className="hidden md:flex items-center space-x-2 px-4 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center space-x-4">
+                {/* Time Display */}
+                <div className="flex items-center space-x-2 text-slate-300">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className="text-sm font-mono text-slate-300">
-                    {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  <span className="text-sm font-mono">
+                    {currentTime.toLocaleTimeString('en-US', { hour12: true })}
                   </span>
                 </div>
 
-                {/* Connection Status */}
-                <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all ${
-                  connectionStatus === 'connected' 
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
-                    : 'bg-red-500/20 text-red-400 border-red-500/30'
-                }`}>
-                  <div className={`w-2 h-2 rounded-full ${
-                    connectionStatus === 'connected' ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'
-                  }`}></div>
-                  <span className="text-sm font-medium">
-                    {connectionStatus === 'connected' ? 'System Online' : 'Disconnected'}
-                  </span>
+                {/* System Status */}
+                <div className="flex items-center space-x-2 px-3 py-1.5 bg-emerald-500/20 rounded-lg border border-emerald-500/30">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-semibold text-emerald-400">System Online</span>
+                </div>
+
+                {/* Notifications Bell */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                  >
+                    <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Notifications Dropdown */}
+                  {showNotifications && (
+                    <div className="absolute right-0 mt-2 w-96 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 overflow-hidden">
+                      <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+                        <h3 className="font-bold text-white">Notifications</h3>
+                        <button
+                          onClick={markAllRead}
+                          className="text-xs text-blue-400 hover:text-blue-300"
+                        >
+                          Mark all read
+                        </button>
+                      </div>
+                      <div className="max-h-96 overflow-y-auto">
+                        {notifications.map(notif => (
+                          <div
+                            key={notif.id}
+                            className={`p-4 border-b border-slate-700 hover:bg-slate-750 transition-colors ${
+                              !notif.read ? 'bg-blue-500/5' : ''
+                            }`}
+                          >
+                            <div className="flex items-start space-x-3">
+                              <div className={`w-2 h-2 rounded-full mt-2 ${
+                                notif.type === 'error' ? 'bg-red-500' :
+                                notif.type === 'warning' ? 'bg-yellow-500' :
+                                notif.type === 'success' ? 'bg-green-500' :
+                                'bg-blue-500'
+                              }`}></div>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-semibold text-white text-sm">{notif.title}</span>
+                                  {!notif.read && (
+                                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-slate-400 mt-1">{notif.message}</p>
+                                <span className="text-xs text-slate-500 mt-1 block">{notif.time}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Navigation */}
                 <nav className="flex space-x-2">
-                  <Link href="/dashboard" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg font-medium hover:from-blue-700 hover:to-cyan-600 transition-all shadow-lg">
+                  <Link href="/dashboard" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg text-sm font-medium shadow-lg">
                     Dashboard
                   </Link>
-                  <Link href="/projects" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg font-medium hover:bg-slate-600 transition-colors">
+                  <Link href="/projects" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-600 transition-colors">
                     Projects
                   </Link>
-                  <Link href="/workspace" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg font-medium hover:bg-slate-600 transition-colors">
+                  <Link href="/workspace" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-600 transition-colors">
                     AI Workspace
+                  </Link>
+                  <Link href="/analytics" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-600 transition-colors">
+                    Analytics
+                  </Link>
+                  <Link href="/integrations" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-600 transition-colors">
+                    Integrations
+                  </Link>
+                  <Link href="/settings" className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-600 transition-colors">
+                    Settings
                   </Link>
                 </nav>
               </div>
             </div>
           </div>
-        </header>
+        </div>
 
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Enhanced Metrics Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {/* Main Dashboard Content */}
+        <div className="max-w-[1800px] mx-auto px-6 py-6 space-y-6">
+          {/* Date Range Filter & Export */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <h2 className="text-2xl font-bold text-white">Dashboard Overview</h2>
+              <div className="flex items-center space-x-2 bg-slate-800 rounded-lg p-1">
+                {(['today', 'week', 'month', 'quarter'] as const).map(range => (
+                  <button
+                    key={range}
+                    onClick={() => setDateRange(range)}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                      dateRange === range
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {range.charAt(0).toUpperCase() + range.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Export Report</span>
+            </button>
+          </div>
+
+          {/* Metrics Grid with Drill-down */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {metrics.map((metric, index) => (
               <div
                 key={index}
-                className="relative bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group overflow-hidden"
+                onClick={() => setSelectedMetric(metric)}
+                className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 hover:border-slate-600 transition-all cursor-pointer hover:shadow-2xl hover:scale-105"
               >
-                {/* Background Gradient Effect */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${metric.bgGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-5xl">{metric.icon}</div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                      metric.trend === 'up' 
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                        : metric.trend === 'down'
-                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                        : 'bg-slate-500/20 text-slate-400 border border-slate-500/30'
-                    }`}>
-                      {metric.change}
-                    </div>
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`p-3 rounded-xl bg-gradient-to-br ${metric.bgGradient} shadow-lg`}>
+                    <span className="text-3xl">{metric.icon}</span>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <h3 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                      {metric.value}
-                    </h3>
-                    <p className="text-sm text-slate-400 font-medium uppercase tracking-wide">
-                      {metric.title}
-                    </p>
+                  <div className={`flex items-center space-x-1 px-2 py-1 rounded-lg ${
+                    metric.trend === 'up' ? 'bg-emerald-500/20 text-emerald-400' :
+                    metric.trend === 'down' ? 'bg-red-500/20 text-red-400' :
+                    'bg-slate-600/20 text-slate-400'
+                  }`}>
+                    {metric.trend === 'up' ? '📈' : metric.trend === 'down' ? '📉' : '➖'}
+                    <span className="text-xs font-semibold">Trending {metric.trend}</span>
                   </div>
-
-                  {/* Trend Indicator */}
-                  <div className="mt-4 flex items-center space-x-2">
-                    {metric.trend === 'up' && (
-                      <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                      </svg>
-                    )}
-                    {metric.trend === 'down' && (
-                      <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
-                      </svg>
-                    )}
-                    <span className="text-xs text-slate-500 font-medium">
-                      {metric.trend === 'up' ? 'Trending up' : metric.trend === 'down' ? 'Declining' : 'Stable'}
-                    </span>
-                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">{metric.title}</h3>
+                  <p className="text-4xl font-bold text-white">{metric.value}</p>
+                  <p className="text-sm text-slate-500">{metric.change}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Sprint Velocity Chart */}
-            <div className="lg:col-span-2 bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-xl">
+            <div className="lg:col-span-2 bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50">
               <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-white flex items-center">
-                    <span className="mr-3">📈</span>
-                    Sprint Velocity Trend
-                  </h2>
-                  <p className="text-sm text-slate-400 mt-1">Last 5 working days performance</p>
-                </div>
-                <button className="px-4 py-2 bg-slate-700/50 text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-600/50 transition-colors border border-slate-600/50">
-                  Export Data
-                </button>
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <span className="mr-2">📊</span>
+                  Sprint Velocity Trend
+                </h2>
+                <span className="text-sm text-slate-400">Last 5 working days performance</span>
               </div>
-
-              {/* Simple Bar Chart */}
               <div className="space-y-4">
                 {velocityData.map((data, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-slate-300 w-12">{data.day}</span>
-                      <div className="flex-1 mx-4">
-                        <div className="flex items-center space-x-2 h-8 bg-slate-900/50 rounded-lg overflow-hidden border border-slate-700/30">
-                          <div 
-                            className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-end pr-2 transition-all duration-500"
-                            style={{ width: `${(data.completed / data.planned) * 100}%` }}
-                          >
-                            <span className="text-xs font-bold text-white">{data.completed}</span>
-                          </div>
+                      <span className="font-semibold text-white w-12">{data.day}</span>
+                      <div className="flex-1 mx-4 bg-slate-700 rounded-full h-8 overflow-hidden relative">
+                        <div
+                          className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-500 flex items-center justify-end pr-3"
+                          style={{ width: `${(data.velocity / 30) * 100}%` }}
+                        >
+                          <span className="text-xs font-bold text-white">{data.velocity}</span>
                         </div>
                       </div>
-                      <span className="text-xs text-slate-400 w-20 text-right">
-                        {data.completed}/{data.planned} points
-                      </span>
+                      <span className="text-slate-400 w-24 text-right">{data.completed}/{data.planned} points</span>
                     </div>
                   </div>
                 ))}
               </div>
-
-              {/* Chart Legend */}
-              <div className="mt-6 pt-4 border-t border-slate-700/50 flex items-center justify-between text-xs">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"></div>
-                    <span className="text-slate-400">Completed</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-slate-700"></div>
-                    <span className="text-slate-400">Remaining</span>
-                  </div>
-                </div>
-                <span className="text-slate-500">Avg: 23.5 points/day</span>
-              </div>
-            </div>
-
-            {/* Team Activity Feed */}
-            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-xl">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white flex items-center">
-                  <span className="mr-3">⚡</span>
-                  Live Activity
-                </h2>
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-              </div>
-
-              <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-track-slate-800 scrollbar-thumb-slate-600">
-                {recentActivities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="group p-3 rounded-xl bg-slate-900/50 border border-slate-700/30 hover:border-blue-500/50 transition-all hover:bg-slate-900/80"
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm border ${getActivityColor(activity.type)}`}>
-                        {getActivityIcon(activity.type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white font-medium truncate">
-                          <span className="text-blue-400">{activity.agentName}</span> {activity.action.toLowerCase()}
-                        </p>
-                        <p className="text-xs text-slate-400 truncate mt-1">
-                          {activity.target}
-                        </p>
-                        <p className="text-xs text-slate-500 mt-1">
-                          {activity.time}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Active Sprints Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {sprints.map((sprint) => (
-              <div
-                key={sprint.id}
-                className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 hover:border-blue-500/50 transition-all shadow-xl"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <h3 className="text-lg font-bold text-white">{sprint.name}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                      sprint.status === 'active'
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                        : sprint.status === 'planning'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : 'bg-slate-500/20 text-slate-400 border border-slate-500/30'
-                    }`}>
-                      {sprint.status}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-slate-400">Sprint Progress</span>
-                    <span className="text-white font-bold">{sprint.progress}%</span>
-                  </div>
-                  <div className="w-full bg-slate-900/50 rounded-full h-3 border border-slate-700/30 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-emerald-500 rounded-full transition-all duration-500 shadow-lg"
-                      style={{ width: `${sprint.progress}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* Sprint Details */}
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/30">
-                    <div className="text-2xl font-bold text-white">{sprint.stories}</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Stories</div>
-                  </div>
-                  <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/30">
-                    <div className="text-2xl font-bold text-white">{sprint.velocity || '-'}</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Velocity</div>
-                  </div>
-                  <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/30">
-                    <div className="text-2xl font-bold text-white">{sprint.team.length}</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Team</div>
-                  </div>
-                </div>
-
-                {/* Team Members */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-700/30">
-                  <div className="flex -space-x-2">
-                    {sprint.team.slice(0, 4).map((member, idx) => (
-                      <div
-                        key={idx}
-                        className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 border-2 border-slate-800 flex items-center justify-center text-xs font-bold text-white"
-                        title={member}
-                      >
-                        {member[0]}
-                      </div>
-                    ))}
-                    {sprint.team.length > 4 && (
-                      <div className="w-8 h-8 rounded-full bg-slate-700 border-2 border-slate-800 flex items-center justify-center text-xs font-bold text-slate-300">
-                        +{sprint.team.length - 4}
-                      </div>
-                    )}
-                  </div>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-lg">
-                    View Sprint
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* SDLC Tools & Integrations Panel */}
-          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-xl mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-white flex items-center">
-                  <span className="mr-3">🔗</span>
-                  SDLC Tools & Integrations
-                </h2>
-                <p className="text-sm text-slate-400 mt-1">End-to-end development workflow automation</p>
-              </div>
-              <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors shadow-lg">
-                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Add Integration
+              <button className="mt-6 w-full py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold transition-colors">
+                Export Data
               </button>
             </div>
 
-            {/* SDLC Workflow Stages */}
-            <div className="mb-6">
-              <h3 className="text-sm font-bold text-slate-300 mb-3 uppercase tracking-wide">Complete SDLC Workflow</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                {[
-                  { stage: 'Epic', icon: '📋', color: 'from-purple-500 to-pink-500', status: 'active' },
-                  { stage: 'Story', icon: '📝', color: 'from-blue-500 to-cyan-500', status: 'active' },
-                  { stage: 'Design', icon: '🎨', color: 'from-indigo-500 to-purple-500', status: 'active' },
-                  { stage: 'Code', icon: '💻', color: 'from-green-500 to-emerald-500', status: 'active' },
-                  { stage: 'Test', icon: '🧪', color: 'from-yellow-500 to-orange-500', status: 'active' },
-                  { stage: 'Deploy', icon: '🚀', color: 'from-red-500 to-rose-500', status: 'active' },
-                  { stage: 'Monitor', icon: '📊', color: 'from-teal-500 to-cyan-500', status: 'active' }
-                ].map((workflow, idx) => (
-                  <div key={idx} className="relative">
-                    <div className={`bg-gradient-to-br ${workflow.color} p-4 rounded-xl text-center shadow-lg hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer`}>
-                      <div className="text-3xl mb-2">{workflow.icon}</div>
-                      <div className="text-white font-bold text-sm">{workflow.stage}</div>
-                      <div className="text-white/80 text-xs mt-1">
-                        {workflow.status === 'active' ? 'Active' : 'Setup'}
-                      </div>
+            {/* Live Activity Feed */}
+            <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <span className="mr-2">⚡</span>
+                  Live Activity
+                </h2>
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              </div>
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {recentActivities.map(activity => (
+                  <div
+                    key={activity.id}
+                    className="flex items-start space-x-3 p-3 rounded-lg hover:bg-slate-700/50 transition-all cursor-pointer"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center flex-shrink-0 shadow-lg">
+                      <span className="text-lg">
+                        {enterpriseAgents.find(a => a.id === activity.agent)?.avatar || '🤖'}
+                      </span>
                     </div>
-                    {idx < 6 && (
-                      <div className="hidden lg:block absolute top-1/2 -right-1.5 transform -translate-y-1/2 z-10">
-                        <svg className="w-3 h-3 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-white">
+                        <span className="font-semibold text-blue-400">{activity.agentName}</span>
+                        {' '}{activity.action.toLowerCase()}{' '}
+                        <span className="font-medium">{activity.target}</span>
+                      </p>
+                      {activity.details && (
+                        <p className="text-xs text-slate-400 mt-1">{activity.details}</p>
+                      )}
+                      <span className="text-xs text-slate-500 mt-1 block">{activity.time}</span>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Integrated Tools Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {toolsLoading ? (
-                <div className="col-span-full text-center py-8 text-slate-400">
-                  Loading tools status...
-                </div>
-              ) : toolsError ? (
-                <div className="col-span-full text-center py-8 text-red-400">
-                  {toolsError}
-                </div>
-              ) : (
-                tools.map((tool) => {
-                  const colorClasses = {
-                    blue: { bg: 'bg-blue-600', border: 'border-blue-500/50', text: 'text-blue-400' },
-                    slate: { bg: 'bg-slate-700', border: 'border-purple-500/50', text: 'text-purple-400' },
-                    red: { bg: 'bg-red-600', border: 'border-red-500/50', text: 'text-red-400' },
-                    cyan: { bg: 'bg-cyan-600', border: 'border-cyan-500/50', text: 'text-cyan-400' },
-                    indigo: { bg: 'bg-indigo-600', border: 'border-indigo-500/50', text: 'text-indigo-400' },
-                    emerald: { bg: 'bg-emerald-600', border: 'border-emerald-500/50', text: 'text-emerald-400' },
-                    orange: { bg: 'bg-orange-600', border: 'border-orange-500/50', text: 'text-orange-400' },
-                    purple: { bg: 'bg-purple-600', border: 'border-purple-500/50', text: 'text-purple-400' }
-                  };
-
-                  const colors = colorClasses[tool.color as keyof typeof colorClasses] || colorClasses.blue;
-
-                  return (
-                    <div key={tool.id} className={`bg-slate-900/50 border border-slate-700/30 rounded-xl p-5 hover:${colors.border} transition-all group`}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-12 h-12 ${colors.bg} rounded-lg flex items-center justify-center shadow-lg`}>
-                            <span className="text-2xl">{tool.icon}</span>
-                          </div>
-                          <div>
-                            <h4 className={`font-bold text-white group-hover:${colors.text} transition-colors`}>{tool.name}</h4>
-                            <p className="text-xs text-slate-400">{tool.type}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-2 h-2 ${
-                            tool.status === 'connected' || tool.status === 'running' 
-                              ? 'bg-emerald-500' 
-                              : 'bg-red-500'
-                          } rounded-full animate-pulse`}></div>
-                          <span className={`text-xs font-bold ${
-                            tool.status === 'connected' || tool.status === 'running'
-                              ? 'text-emerald-400'
-                              : 'text-red-400'
-                          }`}>
-                            {tool.status === 'connected' ? 'Connected' : tool.status === 'running' ? 'Running' : 'Offline'}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="space-y-2 mb-4">
-                        {Object.entries(tool.metrics).slice(0, 3).map(([key, value], idx) => (
-                          <div key={idx} className="flex justify-between text-sm">
-                            <span className="text-slate-400 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                            <span className={`font-bold ${
-                              typeof value === 'string' && (value.includes('Passed') || value.includes('%')) 
-                                ? 'text-emerald-400'
-                                : typeof value === 'number' && key.toLowerCase().includes('bug')
-                                  ? 'text-red-400'
-                                  : 'text-white'
-                            }`}>
-                              {value}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      <button className={`w-full px-3 py-2 ${colors.bg} text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors`}>
-                        {tool.id === 'jira' ? (
-                          <Link href="/projects">Manage Projects</Link>
-                        ) : (
-                          `View ${tool.name}`
-                        )}
-                      </button>
-                    </div>
-                  );
-                })
-              )}
-            </div>
           </div>
 
-          {/* Enterprise Team Panel */}
-          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white flex items-center">
-                <span className="mr-3">⚽</span>
-                Enterprise Team
-              </h2>
-              <Link href="/workspace">
-                <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg font-medium hover:from-blue-700 hover:to-cyan-600 transition-all shadow-lg transform hover:scale-105">
-                  Open AI Workspace →
-                </button>
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {enterpriseAgents.map((agent) => (
-                <div
-                  key={agent.id}
-                  className="bg-slate-900/50 border border-slate-700/30 rounded-xl p-4 hover:border-blue-500/50 transition-all group hover:bg-slate-900/80"
-                >
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="relative">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center text-2xl shadow-lg">
-                        {agent.avatar}
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-900 animate-pulse"></div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-white group-hover:text-blue-400 transition-colors">
-                        {agent.name}
-                      </h3>
-                      <p className="text-xs text-slate-400 truncate">{agent.role}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500">Status</span>
-                      <span className="text-emerald-400 font-medium">Online</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {agent.expertise.slice(0, 2).map((skill, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-1 bg-slate-800 text-slate-400 rounded text-xs border border-slate-700/50"
-                        >
-                          {skill}
+          {/* Team Performance Section */}
+          <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50">
+            <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+              <span className="mr-2">👥</span>
+              Team Performance
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-700">
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-400">Agent</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-400">Role</th>
+                    <th className="text-right py-3 px-4 text-sm font-semibold text-slate-400">Tasks</th>
+                    <th className="text-right py-3 px-4 text-sm font-semibold text-slate-400">Velocity</th>
+                    <th className="text-right py-3 px-4 text-sm font-semibold text-slate-400">Quality</th>
+                    <th className="text-right py-3 px-4 text-sm font-semibold text-slate-400">Commits</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamPerformance.map((member, index) => (
+                    <tr key={index} className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center">
+                            <span>{enterpriseAgents.find(a => a.name === member.agent)?.avatar}</span>
+                          </div>
+                          <span className="font-semibold text-white">{member.agent}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-sm text-slate-400">{member.role}</td>
+                      <td className="py-3 px-4 text-right font-semibold text-white">{member.tasks}</td>
+                      <td className="py-3 px-4 text-right font-semibold text-cyan-400">{member.velocity}</td>
+                      <td className="py-3 px-4 text-right">
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${
+                          member.quality >= 95 ? 'bg-green-500/20 text-green-400' :
+                          member.quality >= 90 ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-red-500/20 text-red-400'
+                        }`}>
+                          {member.quality}%
                         </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                      </td>
+                      <td className="py-3 px-4 text-right font-semibold text-purple-400">{member.commits}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
+
+        {/* Metric Drill-down Modal */}
+        {selectedMetric && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <div className="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-slate-700 shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-4">
+                  <div className={`p-4 rounded-xl bg-gradient-to-br ${selectedMetric.bgGradient}`}>
+                    <span className="text-4xl">{selectedMetric.icon}</span>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{selectedMetric.title}</h3>
+                    <p className="text-slate-400">{selectedMetric.change}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedMetric(null)}
+                  className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                >
+                  <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="text-6xl font-bold text-white mb-8">{selectedMetric.value}</div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {selectedMetric.details?.map((detail, index) => (
+                  <div key={index} className="bg-slate-700/50 rounded-lg p-4">
+                    <div className="text-sm text-slate-400 mb-1">{detail.label}</div>
+                    <div className="text-xl font-bold text-white">{detail.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setSelectedMetric(null)}
+                className="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
+              >
+                Close Details
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Export Modal */}
+        {showExportModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <div className="bg-slate-800 rounded-2xl p-8 max-w-md w-full border border-slate-700 shadow-2xl">
+              <h3 className="text-2xl font-bold text-white mb-6">Export Dashboard Report</h3>
+              <div className="space-y-3">
+                <button
+                  onClick={() => exportReport('pdf')}
+                  className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+                >
+                  <span>📄</span>
+                  <span>Export as PDF</span>
+                </button>
+                <button
+                  onClick={() => exportReport('excel')}
+                  className="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+                >
+                  <span>📊</span>
+                  <span>Export as Excel</span>
+                </button>
+                <button
+                  onClick={() => exportReport('csv')}
+                  className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+                >
+                  <span>📋</span>
+                  <span>Export as CSV</span>
+                </button>
+                <button
+                  onClick={() => setShowExportModal(false)}
+                  className="w-full px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
