@@ -150,7 +150,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const primaryAgentKey = detectPrimaryAgent(message) as keyof typeof agents;
       const collaboratingAgentKeys = getCollaboratingAgents(primaryAgentKey, message);
-      const groqApiKey = process.env.GROQ_API_KEY;
+      const groqApiKey = process.env.GROQ_API_KEY || process.env.groq_api_key;
       const responses: any[] = [];
 
       if (groqApiKey && groqApiKey.length > 10) {

@@ -16,7 +16,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       status: 'healthy',
       agents: 7,
       timestamp: new Date().toISOString(),
-      groq_configured: !!process.env.GROQ_API_KEY,
+      groq_configured: !!(process.env.GROQ_API_KEY || process.env.groq_api_key),
       endpoint: 'health'
     });
     return;
