@@ -90,7 +90,7 @@ class handler(BaseHTTPRequestHandler):
             
             # Check for team/everyone calls
             if "team" in message_lower or "everyone" in message_lower or "all" in message_lower:
-                responding_agents = ["messi", "ronaldo", "neymar", "mbappe", "benzema"]
+                responding_agents = ["messi", "ronaldo", "neymar", "mbappe", "benzema", "modric", "ramos"]
             
             # Default to Modric if no specific agent mentioned
             if not responding_agents:
