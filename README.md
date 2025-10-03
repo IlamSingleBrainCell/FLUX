@@ -3,9 +3,6 @@
 
 
 <div align="center">
-
-
-
 ![FLUX Banner](https://img.shields.io/badge/FLUX-Enterprise-blue?style=for-the-badge&logo=react)<div align="center">**FLUX** is an advanced, real-time multi-agent collaboration platform powered by AI. It enables seamless interaction between specialized AI agents for comprehensive software development lifecycle (SDLC) management, project planning, and team collaboration.
 
 ![Version](https://img.shields.io/badge/version-3.2.0-green?style=for-the-badge)
@@ -14,7 +11,7 @@
 
 ![Status](https://img.shields.io/badge/status-Production%20Ready-success?style=for-the-badge)
 
-![FLUX Banner](https://img.shields.io/badge/FLUX-Enterprise-blue?style=for-the-badge&logo=react)## ✨ Features
+![FLUX Banner](https://img.shields.io/badge/FLUX-Enterprise-blue?style=for-the-badge&logo=react)
 
 **The Ultimate AI-Powered Software Development Lifecycle Platform**
 
@@ -22,7 +19,7 @@
 
 [🚀 Live Demo](https://flux-six-drab.vercel.app) | [📖 Documentation](#-documentation) | [🎯 Features](#-complete-feature-list) | [⚡ Quick Start](#-quick-start)
 
-![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)### 🤖 **7 Specialized AI Agents**
+![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)
 
 </div>
 
