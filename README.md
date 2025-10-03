@@ -26,19 +26,14 @@
 
 </div>
 
-![Status](https://img.shields.io/badge/status-Production%20Ready-success?style=for-the-badge)- **Sara** (Requirements Analyst) - Analyzes and documents project requirements
-
----
-
-- **Marc** (Software Architect) - Designs system architecture and technical specifications  
+![Status](https://img.shields.io/badge/status-Production%20Ready-success?style=for-the-badge)
 
 ## 🌟 What is FLUX?
 
-**The Ultimate AI-Powered Software Development Lifecycle Platform**- **Alex** (Developer) - Implements features and writes code
+**The Ultimate AI-Powered Software Development Lifecycle Platform**
 
 **FLUX Enterprise** is a revolutionary AI-powered platform that transforms software development with **5 specialized AI agents** (named after football legends! ⚽), **real-time collaboration**, and **27+ enterprise features**. From requirements to deployment, FLUX handles your entire SDLC with intelligent automation, analytics, and seamless integrations.
 
-- **Jess** (QA Tester) - Ensures quality through comprehensive testing
 
 ### 🎯 Why FLUX?
 
