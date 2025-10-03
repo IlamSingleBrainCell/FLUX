@@ -1,8 +1,5 @@
 # ⚽ FLUX Enterprise - AI-Powered SDLC Platform# ⚽ FLUX Enterprise - AI-Powered SDLC Platform# 🚀 FLUX - Multi-Agent Collaboration System
 
-
-
-<div align="center">
 ![FLUX Banner](https://img.shields.io/badge/FLUX-Enterprise-blue?style=for-the-badge&logo=react)<div align="center">**FLUX** is an advanced, real-time multi-agent collaboration platform powered by AI. It enables seamless interaction between specialized AI agents for comprehensive software development lifecycle (SDLC) management, project planning, and team collaboration.
 
 ![Version](https://img.shields.io/badge/version-3.2.0-green?style=for-the-badge)
@@ -21,7 +18,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)
 
-</div>
+
 
 ![Status](https://img.shields.io/badge/status-Production%20Ready-success?style=for-the-badge)
 
@@ -38,11 +35,11 @@
 
 - ✅ **5 AI Agents** - Expert help at your fingertips (Messi, Ronaldo, Neymar, Mbappé, Benzema)
 
-- ✅ **27+ Enterprise Features** - Everything you need in one platform- **Emma** (Project Manager) - Coordinates team and manages timelines
+- ✅ **27+ Enterprise Features** - Everything you need in one platform
 
 - ✅ **Real-time Collaboration** - WebSocket-powered instant messaging
 
-- ✅ **Advanced Analytics** - 6+ chart types with insights and predictions</div>- **Robt** (Security Expert) - Assesses security risks and implements protective measures
+- ✅ **Advanced Analytics** - 6+ chart types with insights and predictions
 
 - ✅ **Smart Automation** - AI code review, auto-fix, workflow templates
 
