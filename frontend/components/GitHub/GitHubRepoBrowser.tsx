@@ -39,6 +39,7 @@ export const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [pathHistory, setPathHistory] = useState<string[]>([]);
 
   useEffect(() => {
     loadRepositories();
@@ -165,7 +166,9 @@ export const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({
 
   const handleDirectoryClick = (item: FileTreeItem) => {
     if (item.type === 'dir') {
+      setPathHistory(prev => [...prev, currentPath]);
       setCurrentPath(item.path);
+      setSelectedFiles(new Set()); // Clear selections when navigating
     }
   };
 
@@ -187,9 +190,13 @@ export const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({
   };
 
   const navigateUp = () => {
-    const parts = currentPath.split('/');
-    parts.pop();
-    setCurrentPath(parts.join('/'));
+    if (pathHistory.length > 0) {
+      const previousPath = pathHistory[pathHistory.length - 1];
+      setPathHistory(prev => prev.slice(0, -1));
+      setCurrentPath(previousPath);
+    } else {
+      setCurrentPath('');
+    }
   };
 
   const filteredRepos = repos.filter(repo => 
@@ -204,8 +211,27 @@ export const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({
     const iconMap: { [key: string]: string } = {
       'js': '📜', 'ts': '📘', 'jsx': '⚛️', 'tsx': '⚛️',
       'py': '🐍', 'java': '☕', 'json': '🔧', 'md': '📝',
-      'html': '🌐', 'css': '🎨', 'yml': '⚙️', 'yaml': '⚙️'
+      'html': '🌐', 'css': '🎨', 'yml': '⚙️', 'yaml': '⚙️',
+      'xml': '📋', 'sql': '🗄️', 'sh': '🔨', 'bat': '🔨',
+      'go': '🐹', 'rs': '🦀', 'c': '©️', 'cpp': '©️', 'h': '📑',
+      'rb': '💎', 'php': '🐘', 'swift': '🦅', 'kt': '🟣',
+      'vue': '💚', 'svelte': '🧡', 'scss': '🎨', 'sass': '🎨',
+      'less': '🎨', 'dockerfile': '🐳', 'lock': '🔒',
+      'txt': '📄', 'pdf': '📕', 'zip': '🗜️', 'tar': '🗜️',
+      'gz': '🗜️', 'png': '🖼️', 'jpg': '🖼️', 'jpeg': '🖼️',
+      'gif': '🎞️', 'svg': '🎨', 'env': '🔐', 'example': '📝'
     };
+    
+    // Check for special filenames
+    const lowerName = item.name.toLowerCase();
+    if (lowerName === 'dockerfile') return '🐳';
+    if (lowerName === 'makefile') return '🔨';
+    if (lowerName.includes('readme')) return '📖';
+    if (lowerName.includes('license')) return '📜';
+    if (lowerName.includes('package.json')) return '📦';
+    if (lowerName.includes('tsconfig')) return '⚙️';
+    if (lowerName.includes('.gitignore')) return '🙈';
+    if (lowerName.includes('.env')) return '🔐';
     
     return iconMap[ext || ''] || '📄';
   };
@@ -321,35 +347,69 @@ export const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({
           <div className="flex items-center justify-center h-32">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
+        ) : error ? (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            {error}
+          </div>
+        ) : fileTree.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <svg className="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+            <p className="text-sm">This folder is empty</p>
+          </div>
         ) : (
           <div className="space-y-1">
-            {fileTree.map(item => (
-              <div
-                key={item.path}
-                className="flex items-center gap-2 p-2 rounded hover:bg-gray-50"
-              >
-                {item.type === 'file' && (
-                  <input
-                    type="checkbox"
-                    checked={selectedFiles.has(item.path)}
-                    onChange={() => handleFileToggle(item.path)}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                )}
-                <button
-                  onClick={() => handleDirectoryClick(item)}
-                  className="flex items-center gap-2 flex-1 text-left"
+            {/* Sort: directories first, then files */}
+            {fileTree
+              .sort((a, b) => {
+                if (a.type === b.type) return a.name.localeCompare(b.name);
+                return a.type === 'dir' ? -1 : 1;
+              })
+              .map(item => (
+                <div
+                  key={item.path}
+                  className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 group"
                 >
-                  <span className="text-xl">{getFileIcon(item)}</span>
-                  <span className="text-sm text-gray-900">{item.name}</span>
-                  {item.size && (
-                    <span className="text-xs text-gray-500 ml-auto">
-                      {(item.size / 1024).toFixed(1)} KB
-                    </span>
+                  {item.type === 'file' && (
+                    <input
+                      type="checkbox"
+                      checked={selectedFiles.has(item.path)}
+                      onChange={() => handleFileToggle(item.path)}
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                    />
                   )}
-                </button>
-              </div>
-            ))}
+                  {item.type === 'dir' && (
+                    <div className="w-4 h-4"></div>
+                  )}
+                  <button
+                    onClick={() => handleDirectoryClick(item)}
+                    className={`flex items-center gap-2 flex-1 text-left ${
+                      item.type === 'dir' ? 'cursor-pointer' : 'cursor-default'
+                    }`}
+                    disabled={item.type === 'file'}
+                  >
+                    <span className="text-xl">{getFileIcon(item)}</span>
+                    <span className={`text-sm flex-1 ${
+                      item.type === 'dir' 
+                        ? 'text-blue-600 font-medium group-hover:text-blue-700' 
+                        : 'text-gray-900'
+                    }`}>
+                      {item.name}
+                    </span>
+                    {item.type === 'dir' && (
+                      <svg className="w-4 h-4 text-gray-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    )}
+                    {item.size && item.type === 'file' && (
+                      <span className="text-xs text-gray-500 ml-auto">
+                        {(item.size / 1024).toFixed(1)} KB
+                      </span>
+                    )}
+                  </button>
+                </div>
+              ))}
           </div>
         )}
       </div>
