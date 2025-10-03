@@ -7,6 +7,7 @@ import { enterpriseAgents } from '../config/agents';
 import { DocumentUpload } from '../components/DocumentUpload/DocumentUpload';
 import { GitHubAuth } from '../components/GitHub/GitHubAuth';
 import { GitHubRepoBrowser } from '../components/GitHub/GitHubRepoBrowser';
+import { AgentDropdown, getDefaultAgent, getAllAgents } from '../components/AgentChat/AgentDropdown';
 
 interface Message {
   id: string;
@@ -49,6 +50,10 @@ export default function Workspace() {
   const [githubToken, setGithubToken] = useState<string>('');
   const [isGitHubConnected, setIsGitHubConnected] = useState(false);
   const [showGitHubBrowser, setShowGitHubBrowser] = useState(false);
+  
+  // Agent selection state (GitHub Copilot style)
+  const [selectedAgent, setSelectedAgent] = useState(getDefaultAgent());
+  const [chatMode, setChatMode] = useState<'single' | 'team'>('team'); // single agent or team collaboration
 
   // Simulate agent coming online when called
   const bringAgentOnline = (agentId: string) => {
@@ -103,20 +108,31 @@ export default function Workspace() {
 
     setMessages(prev => [...prev, userMsg]);
 
-    // Detect which agent to call (simple keyword detection)
-    const detectAgent = (msg: string): string => {
-      const lower = msg.toLowerCase();
-      if (lower.includes('requirement') || lower.includes('story') || lower.includes('messi')) return 'requirements_analyst';
-      if (lower.includes('architect') || lower.includes('design') || lower.includes('ronaldo')) return 'software_architect';
-      if (lower.includes('code') || lower.includes('develop') || lower.includes('neymar')) return 'developer';
-      if (lower.includes('test') || lower.includes('qa') || lower.includes('mbappé')) return 'qa_tester';
-      if (lower.includes('deploy') || lower.includes('devops') || lower.includes('benzema')) return 'devops_engineer';
-      if (lower.includes('project') || lower.includes('manage') || lower.includes('modric')) return 'project_manager';
-      if (lower.includes('security') || lower.includes('audit') || lower.includes('ramos')) return 'security_expert';
-      return 'project_manager'; // default
-    };
+    // Prepare message based on chat mode
+    let messageToSend = inputMessage;
+    let targetAgentId: string;
+    
+    if (chatMode === 'single') {
+      // Single agent mode - target the selected agent directly
+      targetAgentId = selectedAgent.id;
+      // Prepend agent name to message to ensure backend routes to correct agent
+      messageToSend = `${selectedAgent.name} ${inputMessage}`;
+    } else {
+      // Team mode - detect which agent(s) to call
+      const detectAgent = (msg: string): string => {
+        const lower = msg.toLowerCase();
+        if (lower.includes('requirement') || lower.includes('story') || lower.includes('messi')) return 'requirements_analyst';
+        if (lower.includes('architect') || lower.includes('design') || lower.includes('ronaldo')) return 'software_architect';
+        if (lower.includes('code') || lower.includes('develop') || lower.includes('neymar')) return 'developer';
+        if (lower.includes('test') || lower.includes('qa') || lower.includes('mbappé')) return 'qa_tester';
+        if (lower.includes('deploy') || lower.includes('devops') || lower.includes('benzema')) return 'devops_engineer';
+        if (lower.includes('project') || lower.includes('manage') || lower.includes('modric')) return 'project_manager';
+        if (lower.includes('security') || lower.includes('audit') || lower.includes('ramos')) return 'security_expert';
+        return 'project_manager'; // default
+      };
+      targetAgentId = detectAgent(inputMessage);
+    }
 
-    const targetAgentId = detectAgent(inputMessage);
     const targetAgent = enterpriseAgents.find(a => a.id === targetAgentId);
 
     // Bring agent online
@@ -131,7 +147,6 @@ export default function Workspace() {
       )
     );
 
-    const messageToSend = inputMessage;
     setInputMessage('');
 
     try {
@@ -144,7 +159,8 @@ export default function Workspace() {
         },
         body: JSON.stringify({ 
           message: messageToSend,
-          uploaded_files: uploadedFiles // Include uploaded files
+          uploaded_files: uploadedFiles, // Include uploaded files
+          chat_mode: chatMode // Send chat mode to backend
         }),
       });
 
@@ -467,6 +483,41 @@ export default function Workspace() {
 
                 {/* Input Area */}
                 <div className="px-6 py-4 border-t border-slate-200 bg-slate-50">
+                  {/* Agent Selector & Mode Toggle - GitHub Copilot Style */}
+                  <div className="mb-4 flex items-center justify-between">
+                    <AgentDropdown
+                      selectedAgent={selectedAgent}
+                      onAgentChange={(agent) => {
+                        setSelectedAgent(agent);
+                        setChatMode('single'); // Switch to single agent mode when selecting
+                      }}
+                    />
+                    
+                    {/* Mode Toggle */}
+                    <div className="flex items-center space-x-2 bg-slate-100 rounded-lg p-1">
+                      <button
+                        onClick={() => setChatMode('single')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                          chatMode === 'single'
+                            ? 'bg-white text-blue-600 shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        Single Agent
+                      </button>
+                      <button
+                        onClick={() => setChatMode('team')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                          chatMode === 'team'
+                            ? 'bg-white text-blue-600 shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        Team Mode
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Uploaded Files Preview */}
                   {uploadedFiles.length > 0 && (
                     <div className="mb-3 flex flex-wrap gap-2">
