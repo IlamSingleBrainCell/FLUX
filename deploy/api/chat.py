@@ -21,6 +21,7 @@ class handler(BaseHTTPRequestHandler):
             request_data = json.loads(post_data.decode())
             message = request_data.get('message', '')
             uploaded_files = request_data.get('uploaded_files', [])
+            chat_mode = request_data.get('chat_mode', 'team')  # Get chat mode from request
             
             groq_api_key = os.environ.get("GROQ_API_KEY")
             
@@ -165,30 +166,58 @@ In team collaboration, actively communicate with:
             responding_agents = []
             message_lower = message.lower()
             
-            # Check for specific agent mentions
-            if "messi" in message_lower or "requirement" in message_lower:
-                responding_agents.append("messi")
-            if "ronaldo" in message_lower or "architect" in message_lower:
-                responding_agents.append("ronaldo")
-            if "neymar" in message_lower or "developer" in message_lower or "code" in message_lower:
-                responding_agents.append("neymar")
-            if "mbappe" in message_lower or "mbappé" in message_lower or "qa" in message_lower or "test" in message_lower:
-                responding_agents.append("mbappe")
-            if "benzema" in message_lower or "devops" in message_lower or "deploy" in message_lower:
-                responding_agents.append("benzema")
-            if "modric" in message_lower or "project manager" in message_lower or "planning" in message_lower:
-                responding_agents.append("modric")
-            if "ramos" in message_lower or "security" in message_lower:
-                responding_agents.append("ramos")
-            
-            # Check for team/everyone calls OR document upload (trigger full team)
-            if "team" in message_lower or "everyone" in message_lower or "all" in message_lower or uploaded_files:
-                responding_agents = ["modric", "messi", "ronaldo", "neymar", "mbappe", "benzema", "ramos"]
-                # Modric first to coordinate
-            
-            # Default to Modric if no specific agent mentioned
-            if not responding_agents:
-                responding_agents = ["modric"]
+            # SINGLE AGENT MODE - Only respond with the specifically selected agent
+            if chat_mode == 'single':
+                # Extract agent name from message (frontend prepends it)
+                # Format: "AgentName actual message"
+                agent_name_map = {
+                    'messi': 'messi',
+                    'ronaldo': 'ronaldo', 
+                    'neymar': 'neymar',
+                    'mbappé': 'mbappe',
+                    'mbappe': 'mbappe',
+                    'benzema': 'benzema',
+                    'modric': 'modric',
+                    'ramos': 'ramos'
+                }
+                
+                # Find which agent name appears at the start of the message
+                for agent_name, agent_id in agent_name_map.items():
+                    if message_lower.startswith(agent_name.lower()):
+                        responding_agents = [agent_id]
+                        # Remove agent name from message for cleaner processing
+                        message = message[len(agent_name):].strip()
+                        break
+                
+                # If no agent found at start, default to modric
+                if not responding_agents:
+                    responding_agents = ["modric"]
+            else:
+                # TEAM MODE - Original multi-agent detection logic
+                # Check for specific agent mentions
+                if "messi" in message_lower or "requirement" in message_lower:
+                    responding_agents.append("messi")
+                if "ronaldo" in message_lower or "architect" in message_lower:
+                    responding_agents.append("ronaldo")
+                if "neymar" in message_lower or "developer" in message_lower or "code" in message_lower:
+                    responding_agents.append("neymar")
+                if "mbappe" in message_lower or "mbappé" in message_lower or "qa" in message_lower or "test" in message_lower:
+                    responding_agents.append("mbappe")
+                if "benzema" in message_lower or "devops" in message_lower or "deploy" in message_lower:
+                    responding_agents.append("benzema")
+                if "modric" in message_lower or "project manager" in message_lower or "planning" in message_lower:
+                    responding_agents.append("modric")
+                if "ramos" in message_lower or "security" in message_lower:
+                    responding_agents.append("ramos")
+                
+                # Check for team/everyone calls OR document upload (trigger full team)
+                if "team" in message_lower or "everyone" in message_lower or "all" in message_lower or uploaded_files:
+                    responding_agents = ["modric", "messi", "ronaldo", "neymar", "mbappe", "benzema", "ramos"]
+                    # Modric first to coordinate
+                
+                # Default to Modric if no specific agent mentioned
+                if not responding_agents:
+                    responding_agents = ["modric"]
             
             responses = []
             
@@ -198,7 +227,8 @@ In team collaboration, actively communicate with:
                     client = Groq(api_key=groq_api_key)
                     
                     # MULTI-ROUND COLLABORATION - Agents discuss among themselves
-                    max_rounds = 3 if uploaded_files else 1  # More rounds for document analysis
+                    # Only use multiple rounds in team mode with documents
+                    max_rounds = 3 if (uploaded_files and chat_mode == 'team') else 1
                     all_responses = []
                     
                     for round_num in range(max_rounds):
