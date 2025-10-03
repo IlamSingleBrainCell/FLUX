@@ -139,7 +139,7 @@ export const AgentDropdown: React.FC<AgentDropdownProps> = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-full bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-50 overflow-hidden">
+        <div className="absolute top-full left-0 mt-2 w-[500px] bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9999] overflow-hidden">
           {/* Header */}
           <div className="px-4 py-3 bg-slate-900/50 border-b border-slate-600">
             <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
@@ -148,7 +148,7 @@ export const AgentDropdown: React.FC<AgentDropdownProps> = ({
           </div>
 
           {/* Agent List */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[500px] overflow-y-auto">
             {agents.map((agent) => (
               <button
                 key={agent.id}

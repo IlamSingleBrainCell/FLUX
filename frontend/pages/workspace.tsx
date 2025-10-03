@@ -380,7 +380,7 @@ export default function Workspace() {
 
             {/* CENTER - Chat Interface */}
             <div className="col-span-6 flex flex-col">
-              <div className="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+              <div className="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-visible">
                 {/* Chat Header */}
                 <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
                   <div className="flex items-center justify-between">
@@ -482,9 +482,9 @@ export default function Workspace() {
                 </div>
 
                 {/* Input Area */}
-                <div className="px-6 py-4 border-t border-slate-200 bg-slate-50">
+                <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 relative">
                   {/* Agent Selector & Mode Toggle - GitHub Copilot Style */}
-                  <div className="mb-4 space-y-3">
+                  <div className="mb-4 space-y-3 relative z-10">
                     <div className="flex items-center justify-between">
                       <AgentDropdown
                         selectedAgent={selectedAgent}
