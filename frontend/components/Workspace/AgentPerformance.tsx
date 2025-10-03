@@ -26,6 +26,7 @@ export const AgentPerformance: React.FC<AgentPerformanceProps> = ({
 }) => {
   const [selectedTimeRange, setSelectedTimeRange] = useState(timeRange);
   const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
+  const [showCalculationInfo, setShowCalculationInfo] = useState(false);
 
   const getAccuracyColor = (accuracy: number) => {
     if (accuracy >= 90) return 'text-green-600 bg-green-100';
@@ -66,26 +67,167 @@ export const AgentPerformance: React.FC<AgentPerformanceProps> = ({
             </div>
           </div>
 
-          {/* Time Range Selector */}
-          <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-            {(['24h', '7d', '30d'] as const).map(range => (
-              <button
-                key={range}
-                onClick={() => setSelectedTimeRange(range)}
-                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                  selectedTimeRange === range
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {range === '24h' ? 'Today' : range === '7d' ? 'Week' : 'Month'}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            {/* Calculation Info Button */}
+            <button
+              onClick={() => setShowCalculationInfo(!showCalculationInfo)}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1.5"
+              title="How metrics are calculated"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>How it's calculated</span>
+            </button>
+
+            {/* Time Range Selector */}
+            <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+              {(['24h', '7d', '30d'] as const).map(range => (
+                <button
+                  key={range}
+                  onClick={() => setSelectedTimeRange(range)}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    selectedTimeRange === range
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {range === '24h' ? 'Today' : range === '7d' ? 'Week' : 'Month'}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
+        {/* Calculation Info Panel */}
+        {showCalculationInfo && (
+          <div className="mt-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+            <div className="flex items-start gap-2 mb-3">
+              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 mb-1">📐 Performance Metrics Calculation</h4>
+                <p className="text-xs text-slate-600">Understanding how agent performance is measured</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {/* Accuracy */}
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">🎯</span>
+                  <span className="text-xs font-bold text-slate-900">Accuracy Score</span>
+                </div>
+                <div className="text-xs text-slate-700 mb-2">
+                  <strong>Formula:</strong> <code className="px-2 py-0.5 bg-slate-100 rounded text-blue-600 font-mono">(Successful Tasks / Total Tasks) × 100</code>
+                </div>
+                <div className="text-xs text-slate-600">
+                  • <strong>Successful Tasks:</strong> Tasks completed without errors or user corrections<br />
+                  • <strong>Total Tasks:</strong> All tasks assigned to the agent<br />
+                  • <strong>Threshold:</strong> 🟢 90%+ Excellent | 🟡 75-89% Good | 🔴 &lt;75% Needs Improvement
+                </div>
+              </div>
+
+              {/* Response Time */}
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">⚡</span>
+                  <span className="text-xs font-bold text-slate-900">Average Response Time</span>
+                </div>
+                <div className="text-xs text-slate-700 mb-2">
+                  <strong>Formula:</strong> <code className="px-2 py-0.5 bg-slate-100 rounded text-blue-600 font-mono">Σ(Response Times) / Number of Responses</code>
+                </div>
+                <div className="text-xs text-slate-600">
+                  • <strong>Measured:</strong> Time from task assignment to first meaningful response<br />
+                  • <strong>Excludes:</strong> Network latency, queue wait time<br />
+                  • <strong>Goal:</strong> Lower is better (target: &lt;2 seconds for most tasks)
+                </div>
+              </div>
+
+              {/* Tasks Completed */}
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">✅</span>
+                  <span className="text-xs font-bold text-slate-900">Tasks Completed</span>
+                </div>
+                <div className="text-xs text-slate-700 mb-2">
+                  <strong>Formula:</strong> <code className="px-2 py-0.5 bg-slate-100 rounded text-blue-600 font-mono">Count of Completed Tasks in Time Range</code>
+                </div>
+                <div className="text-xs text-slate-600">
+                  • <strong>Counted:</strong> Tasks marked as "completed" or "delivered"<br />
+                  • <strong>Time Range:</strong> Filtered by selected period (24h/7d/30d)<br />
+                  • <strong>Indicator:</strong> Measures agent productivity and workload handling
+                </div>
+              </div>
+
+              {/* User Rating */}
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">⭐</span>
+                  <span className="text-xs font-bold text-slate-900">User Rating</span>
+                </div>
+                <div className="text-xs text-slate-700 mb-2">
+                  <strong>Formula:</strong> <code className="px-2 py-0.5 bg-slate-100 rounded text-blue-600 font-mono">Σ(User Ratings) / Number of Ratings</code>
+                </div>
+                <div className="text-xs text-slate-600">
+                  • <strong>Scale:</strong> 1-5 stars (user feedback on responses)<br />
+                  • <strong>Collection:</strong> From message reactions and explicit ratings<br />
+                  • <strong>Weight:</strong> More recent ratings have slightly higher influence
+                </div>
+              </div>
+
+              {/* Trend Indicator */}
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">📈</span>
+                  <span className="text-xs font-bold text-slate-900">Performance Trend</span>
+                </div>
+                <div className="text-xs text-slate-700 mb-2">
+                  <strong>Formula:</strong> <code className="px-2 py-0.5 bg-slate-100 rounded text-blue-600 font-mono">Compare Current Period vs Previous Period</code>
+                </div>
+                <div className="text-xs text-slate-600">
+                  • <strong>📈 Up Trend:</strong> Accuracy improved by ≥5% compared to previous period<br />
+                  • <strong>➡️ Stable:</strong> Accuracy change within ±5%<br />
+                  • <strong>📉 Down Trend:</strong> Accuracy decreased by ≥5%
+                </div>
+              </div>
+
+              {/* Overall Score */}
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-3 border border-purple-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">🏆</span>
+                  <span className="text-xs font-bold text-slate-900">Top Performer Selection</span>
+                </div>
+                <div className="text-xs text-slate-700 mb-2">
+                  <strong>Criteria:</strong> <code className="px-2 py-0.5 bg-slate-100 rounded text-purple-600 font-mono">Highest Accuracy Score</code>
+                </div>
+                <div className="text-xs text-slate-600">
+                  • <strong>Primary Factor:</strong> Accuracy percentage (most important)<br />
+                  • <strong>Tiebreaker:</strong> If tied, higher user rating wins<br />
+                  • <strong>Updated:</strong> Recalculated in real-time as tasks complete
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 p-3 bg-white rounded-lg border border-blue-200">
+              <div className="flex items-start gap-2">
+                <svg className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="text-xs text-slate-700">
+                  <strong className="text-blue-700">Note:</strong> All metrics are calculated in real-time based on actual task execution. 
+                  Historical data is preserved for trend analysis. Metrics reset when changing time ranges but maintain accuracy for comparison.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Top Performer Badge */}
-        <div className="p-3 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+        <div className="p-3 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border border-yellow-200 mt-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center text-2xl shadow-lg">
               {topPerformer.avatar}
