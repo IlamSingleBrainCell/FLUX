@@ -19,6 +19,15 @@ import {
   Conversation,
 } from '../utils/conversationStorage';
 
+// New workspace enhancement components
+import { MessageReactions } from '../components/Workspace/MessageReactions';
+import { SmartPrompts } from '../components/Workspace/SmartPrompts';
+import { PinnedMessages } from '../components/Workspace/PinnedMessages';
+import { MultiFileUpload } from '../components/Workspace/MultiFileUpload';
+import { AgentPerformance } from '../components/Workspace/AgentPerformance';
+import { KeyboardShortcutsPanel, useKeyboardShortcuts } from '../components/Workspace/KeyboardShortcuts';
+import { TemplateLibrary } from '../components/Workspace/TemplateLibrary';
+
 interface Message {
   id: string;
   agentId: string;
@@ -78,6 +87,22 @@ export default function Workspace() {
   const [isStreaming, setIsStreaming] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // New feature states
+  const [messageReactions, setMessageReactions] = useState<Record<string, any[]>>({});
+  const [messageRatings, setMessageRatings] = useState<Record<string, number>>({});
+  const [pinnedMessages, setPinnedMessages] = useState<any[]>([]);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [agentMetrics] = useState([
+    { id: 'requirements_analyst', name: 'Messi', avatar: '⚽', accuracy: 96, avgResponseTime: 1.1, tasksCompleted: 34, userRating: 4.9, specialties: ['Requirements', 'User Stories'], trend: 'up' as const },
+    { id: 'software_architect', name: 'Ronaldo', avatar: '🏗️', accuracy: 94, avgResponseTime: 1.3, tasksCompleted: 28, userRating: 4.8, specialties: ['Architecture', 'Design Patterns'], trend: 'up' as const },
+    { id: 'developer', name: 'Neymar', avatar: '💻', accuracy: 95, avgResponseTime: 1.2, tasksCompleted: 45, userRating: 4.9, specialties: ['Full-Stack', 'Code Generation'], trend: 'up' as const },
+    { id: 'qa_tester', name: 'Mbappé', avatar: '🧪', accuracy: 97, avgResponseTime: 0.9, tasksCompleted: 52, userRating: 5.0, specialties: ['Testing', 'Quality Assurance'], trend: 'up' as const },
+    { id: 'devops_engineer', name: 'Benzema', avatar: '🚀', accuracy: 93, avgResponseTime: 1.4, tasksCompleted: 31, userRating: 4.7, specialties: ['CI/CD', 'Infrastructure'], trend: 'stable' as const },
+    { id: 'project_manager', name: 'Modrić', avatar: '📊', accuracy: 92, avgResponseTime: 1.5, tasksCompleted: 26, userRating: 4.6, specialties: ['Planning', 'Coordination'], trend: 'stable' as const },
+    { id: 'security_expert', name: 'Ramos', avatar: '🔒', accuracy: 98, avgResponseTime: 1.0, tasksCompleted: 19, userRating: 5.0, specialties: ['Security', 'Compliance'], trend: 'up' as const },
+  ]);
 
   // Load conversation on mount
   useEffect(() => {
@@ -146,6 +171,60 @@ export default function Workspace() {
     }
     setShowWelcome(conversation.messages.length === 0);
   };
+
+  // New feature handlers
+  const handleReact = (messageId: string, emoji: string) => {
+    setMessageReactions(prev => ({
+      ...prev,
+      [messageId]: [...(prev[messageId] || []), { emoji, user: 'You' }]
+    }));
+  };
+
+  const handleRateMessage = (messageId: string, rating: number) => {
+    setMessageRatings(prev => ({ ...prev, [messageId]: rating }));
+  };
+
+  const togglePin = (messageId: string) => {
+    const message = messages.find(m => m.id === messageId);
+    if (!message) return;
+    
+    setPinnedMessages(prev => {
+      const isPinned = prev.some(p => p.id === messageId);
+      if (isPinned) {
+        return prev.filter(p => p.id !== messageId);
+      } else {
+        return [...prev, {
+          id: messageId,
+          agentName: message.agentName,
+          content: message.content,
+          timestamp: message.timestamp,
+          messageIndex: messages.indexOf(message)
+        }];
+      }
+    });
+  };
+
+  const jumpToMessage = (index: number) => {
+    const messageElements = document.querySelectorAll('[data-message-index]');
+    messageElements[index]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  const handleSelectTemplate = (template: string) => {
+    setInputMessage(template);
+    setShowTemplates(false);
+  };
+
+  // Setup keyboard shortcuts
+  const shortcuts = [
+    { key: 'Ctrl+N', description: 'New conversation', action: handleNewConversation, category: 'chat' },
+    { key: 'Ctrl+H', description: 'Toggle history', action: () => setShowConversationSidebar(!showConversationSidebar), category: 'navigation' },
+    { key: 'Ctrl+/', description: 'Show shortcuts', action: () => setShowShortcuts(true), category: 'navigation' },
+    { key: 'Ctrl+T', description: 'Template library', action: () => setShowTemplates(true), category: 'chat' },
+    { key: 'Ctrl+Enter', description: 'Send message', action: handleSendMessage, category: 'chat' },
+    { key: 'Escape', description: 'Close modals', action: () => { setShowShortcuts(false); setShowTemplates(false); }, category: 'navigation' },
+  ];
+
+  useKeyboardShortcuts(shortcuts);
 
   // Simulate agent coming online when called
   const bringAgentOnline = (agentId: string) => {
@@ -460,6 +539,21 @@ export default function Workspace() {
                 </div>
               </div>
 
+              {/* Agent Performance Dashboard */}
+              <AgentPerformance
+                agents={agentMetrics}
+                timeRange="24h"
+              />
+
+              {/* Pinned Messages */}
+              {pinnedMessages.length > 0 && (
+                <PinnedMessages
+                  pinnedMessages={pinnedMessages}
+                  onJumpToMessage={jumpToMessage}
+                  onUnpin={(id) => setPinnedMessages(prev => prev.filter(p => p.id !== id))}
+                />
+              )}
+
               {/* Quick Actions */}
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-4">
                 <h3 className="text-sm font-bold text-slate-900 mb-3">Quick Actions</h3>
@@ -506,10 +600,26 @@ export default function Workspace() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setShowShortcuts(true)}
+                        className="px-3 py-1.5 hover:bg-slate-100 rounded-lg text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-1.5"
+                        title="Keyboard shortcuts (Ctrl+/)"
+                      >
+                        <span>⌨️</span>
+                        <span className="hidden lg:inline">Shortcuts</span>
+                      </button>
+                      <button
+                        onClick={() => setShowTemplates(true)}
+                        className="px-3 py-1.5 hover:bg-slate-100 rounded-lg text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-1.5"
+                        title="Prompt templates (Ctrl+T)"
+                      >
+                        <span>📚</span>
+                        <span className="hidden lg:inline">Templates</span>
+                      </button>
                       <button 
                         onClick={handleNewConversation}
                         className="px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg text-sm transition-colors flex items-center gap-1.5"
-                        title="New chat"
+                        title="New chat (Ctrl+N)"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -572,8 +682,8 @@ export default function Workspace() {
                     </div>
                   )}
 
-                  {messages.map(msg => (
-                    <div key={msg.id} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
+                  {messages.map((msg, idx) => (
+                    <div key={msg.id} data-message-index={idx} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[75%] ${msg.isUser ? 'order-2' : 'order-1'}`}>
                         <div className="flex items-start space-x-2 mb-1">
                           {!msg.isUser && (
@@ -606,6 +716,20 @@ export default function Workspace() {
                                 <span className="font-semibold text-slate-700">{msg.artifact.title}</span>
                                 <span className="text-slate-400">→</span>
                               </button>
+                            )}
+                            {/* Message Reactions - Only for agent messages */}
+                            {!msg.isUser && (
+                              <MessageReactions
+                                messageId={msg.id}
+                                reactions={messageReactions[msg.id]}
+                                onReact={(emoji) => handleReact(msg.id, emoji)}
+                                onCopy={() => navigator.clipboard.writeText(msg.content)}
+                                onRegenerate={() => console.log('Regenerate:', msg.id)}
+                                onPin={() => togglePin(msg.id)}
+                                onRate={(rating) => handleRateMessage(msg.id, rating)}
+                                isPinned={pinnedMessages.some(p => p.id === msg.id)}
+                                rating={messageRatings[msg.id]}
+                              />
                             )}
                           </div>
                         </div>
@@ -643,6 +767,17 @@ export default function Workspace() {
                   {/* Scroll anchor */}
                   <div ref={messagesEndRef} />
                 </div>
+
+                {/* Smart Prompts - Shows after agent response */}
+                {messages.length > 0 && messages[messages.length - 1]?.isUser === false && (
+                  <div className="px-6 py-3 border-t border-slate-200 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
+                    <SmartPrompts
+                      lastMessage={messages[messages.length - 1]?.content}
+                      context="code"
+                      onSelectPrompt={(prompt) => setInputMessage(prompt)}
+                    />
+                  </div>
+                )}
 
                 {/* Input Area */}
                 <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 relative">
@@ -714,24 +849,13 @@ export default function Workspace() {
                     )}
                   </div>
 
-                  {/* Uploaded Files Preview */}
+                  {/* Multi-File Upload Context */}
                   {uploadedFiles.length > 0 && (
-                    <div className="mb-3 flex flex-wrap gap-2">
-                      {uploadedFiles.map((file) => (
-                        <div
-                          key={file.id}
-                          className="inline-flex items-center space-x-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm"
-                        >
-                          <span className="text-blue-600">📎</span>
-                          <span className="text-blue-900 font-medium truncate max-w-[200px]">{file.name}</span>
-                          <button
-                            onClick={() => setUploadedFiles(prev => prev.filter(f => f.id !== file.id))}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
+                    <div className="mb-3">
+                      <MultiFileUpload
+                        files={uploadedFiles}
+                        onFilesChange={setUploadedFiles}
+                      />
                     </div>
                   )}
                   
@@ -952,6 +1076,20 @@ export default function Workspace() {
             </div>
           </div>
         )}
+
+        {/* Keyboard Shortcuts Modal */}
+        <KeyboardShortcutsPanel
+          shortcuts={shortcuts}
+          onClose={() => setShowShortcuts(false)}
+          isOpen={showShortcuts}
+        />
+
+        {/* Template Library Modal */}
+        <TemplateLibrary
+          onSelectTemplate={handleSelectTemplate}
+          onClose={() => setShowTemplates(false)}
+          isOpen={showTemplates}
+        />
       </div> {/* Close min-h-screen Div */}
     </>
   );
