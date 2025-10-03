@@ -4,7 +4,7 @@ from .base_agent import BaseSDLCAgent
 class DeveloperAgent(BaseSDLCAgent):
     def __init__(self):
         super().__init__(
-            name="Alex",
+            name="Neymar ⚽",
             role="developer",
             expertise=["Code Development", "Debugging", "Code Review", "Technical Implementation"]
         )

@@ -27,45 +27,37 @@ class SimpleAgentRouter:
         
         # Initialize all agents once
         self.agents = {
-            "sara": RequirementsAnalyst(),
-            "marc": SoftwareArchitect(),
-            "alex": DeveloperAgent(),
-            "jess": QATester(),
-            "dave": DevOpsEngineer(),
-            "emma": ProjectManager(),
-            "robt": SecurityExpert(),
+            "messi": RequirementsAnalyst(),
+            "ronaldo": SoftwareArchitect(),
+            "neymar": DeveloperAgent(),
+            "mbappe": QATester(),
+            "benzema": DevOpsEngineer(),
+            "modric": ProjectManager(),
+            "ramos": SecurityExpert(),
         }
         
         # Simple name mappings - no regex complexity
         self.agent_names = {
-            # Primary names
-            "sara": "sara",
-            "marc": "marc", 
-            "alex": "alex",
-            "jess": "jess",
-            "dave": "dave",
-            "emma": "emma",
-            "robt": "robt",
-            "rob": "robt",  # Rob -> Robt
+            # Primary names (football players)
+            "messi": "messi",
+            "ronaldo": "ronaldo", 
+            "neymar": "neymar",
+            "mbappe": "mbappe",
+            "mbappé": "mbappe",
+            "benzema": "benzema",
+            "modric": "modric",
+            "ramos": "ramos",
             
-            # Full names
-            "sara requirements": "sara",
-            "marc architect": "marc",
-            "alex developer": "alex", 
-            "jess tester": "jess",
-            "dave devops": "dave",
-            "emma manager": "emma",
-            "robt security": "robt",
-            "robert": "robt",
-            
-            # Variations
-            "sarah": "sara",
-            "marcus": "marc",
-            "alexander": "alex",
-            "jessica": "jess", 
-            "david": "dave",
-            "emily": "emma",
-            "robert": "robt"
+            # Role-based (for backwards compatibility)
+            "requirements": "messi",
+            "architect": "ronaldo",
+            "developer": "neymar", 
+            "qa": "mbappe",
+            "tester": "mbappe",
+            "devops": "benzema",
+            "project": "modric",
+            "manager": "modric",
+            "security": "ramos"
         }
         
         print(f"[ROUTER] ✅ Loaded {len(self.agents)} agents: {list(self.agents.keys())}")
@@ -190,15 +182,15 @@ class SimpleAgentRouter:
                 responses[selected_agent] = error_msg
                 print(f"[ROUTER] ❌ {selected_agent} error: {e}")
         else:
-            # Default to Sara only if absolutely no other option
-            print(f"[ROUTER] 🎯 DEFAULT to Sara (Requirements Analyst)")
+            # Default to Messi only if absolutely no other option
+            print(f"[ROUTER] 🎯 DEFAULT to Messi (Requirements Analyst)")
             try:
-                response = await self.agents["sara"].process_request(message, context)
-                responses["sara"] = response
-                print(f"[ROUTER] ✅ Sara responded: {len(response)} chars")
+                response = await self.agents["messi"].process_request(message, context)
+                responses["messi"] = response
+                print(f"[ROUTER] ✅ Messi responded: {len(response)} chars")
             except Exception as e:
-                responses["sara"] = f"Error: {str(e)}"
-                print(f"[ROUTER] ❌ Sara error: {e}")
+                responses["messi"] = f"Error: {str(e)}"
+                print(f"[ROUTER] ❌ Messi error: {e}")
         
         return responses
     
@@ -211,13 +203,13 @@ class SimpleAgentRouter:
         
         # Keywords for each agent
         agent_keywords = {
-            "sara": ["requirement", "requirements", "specification", "spec", "user story", "acceptance criteria", "business rule"],
-            "marc": ["architecture", "design", "system", "structure", "component", "module", "pattern", "framework"],
-            "alex": ["code", "coding", "implement", "development", "programming", "function", "class", "method", "algorithm"],
-            "jess": ["test", "testing", "quality", "bug", "issue", "validation", "verification", "qa", "quality assurance"],
-            "dave": ["deploy", "deployment", "infrastructure", "server", "cloud", "docker", "kubernetes", "devops", "ci/cd"],
-            "emma": ["project", "management", "timeline", "schedule", "milestone", "resource", "planning", "coordination"],
-            "robt": ["security", "vulnerability", "authentication", "authorization", "encryption", "protection", "secure"]
+            "messi": ["requirement", "requirements", "specification", "spec", "user story", "acceptance criteria", "business rule"],
+            "ronaldo": ["architecture", "design", "system", "structure", "component", "module", "pattern", "framework"],
+            "neymar": ["code", "coding", "implement", "development", "programming", "function", "class", "method", "algorithm"],
+            "mbappe": ["test", "testing", "quality", "bug", "issue", "validation", "verification", "qa", "quality assurance"],
+            "benzema": ["deploy", "deployment", "infrastructure", "server", "cloud", "docker", "kubernetes", "devops", "ci/cd"],
+            "modric": ["project", "management", "timeline", "schedule", "milestone", "resource", "planning", "coordination"],
+            "ramos": ["security", "vulnerability", "authentication", "authorization", "encryption", "protection", "secure"]
         }
         
         # Score each agent based on keyword matches

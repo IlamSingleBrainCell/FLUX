@@ -4,7 +4,7 @@ from .base_agent import BaseSDLCAgent
 class QATester(BaseSDLCAgent):
     def __init__(self):
         super().__init__(
-            name="Jess",
+            name="Mbappé ⚽",
             role="qa_tester",
             expertise=["Test Planning", "Test Automation", "Quality Assurance", "Bug Tracking"]
         )

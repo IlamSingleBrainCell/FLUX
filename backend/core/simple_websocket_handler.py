@@ -103,15 +103,15 @@ class SimpleWebSocketHandler:
     async def _send_agent_response(self, session_id: str, agent_key: str, response: str, user_request: UserRequest) -> None:
         """Send agent response via WebSocket and update session history"""
         try:
-            # Convert agent key to display name
+            # Convert agent key to display name (Football players)
             agent_display_names = {
-                "sara": "Sara (Requirements Analyst)",
-                "marc": "Marc (Software Architect)", 
-                "alex": "Alex (Developer)",
-                "jess": "Jess (QA Tester)",
-                "dave": "Dave (DevOps Engineer)",
-                "emma": "Emma (Project Manager)",
-                "robt": "Robt (Security Expert)"
+                "messi": "Messi ⚽ (Requirements Analyst)",
+                "ronaldo": "Ronaldo ⚽ (Software Architect)", 
+                "neymar": "Neymar ⚽ (Developer)",
+                "mbappe": "Mbappé ⚽ (QA Tester)",
+                "benzema": "Benzema ⚽ (DevOps Engineer)",
+                "modric": "Modric ⚽ (Project Manager)",
+                "ramos": "Ramos ⚽ (Security Expert)"
             }
             
             display_name = agent_display_names.get(agent_key, agent_key)

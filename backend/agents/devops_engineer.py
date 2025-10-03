@@ -4,9 +4,9 @@ from .base_agent import BaseSDLCAgent
 class DevOpsEngineer(BaseSDLCAgent):
     def __init__(self):
         super().__init__(
-            name="Dave",
+            name="Benzema ⚽",
             role="devops_engineer",
-            expertise=["CI/CD", "Infrastructure", "Deployment", "Monitoring"]
+            expertise=["CI/CD", "Infrastructure as Code", "Cloud Deployment", "Monitoring"]
         )
 
     def get_system_prompt(self) -> str:

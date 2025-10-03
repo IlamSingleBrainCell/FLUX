@@ -4,9 +4,9 @@ from .base_agent import BaseSDLCAgent
 class SoftwareArchitect(BaseSDLCAgent):
     def __init__(self):
         super().__init__(
-            name="Marc",
+            name="Ronaldo ⚽",
             role="software_architect",
-            expertise=["System Design", "Architecture Patterns", "Technology Selection", "Scalability"]
+            expertise=["System Design", "Architecture Patterns", "Technical Specifications", "Technology Selection"]
         )
 
     def get_system_prompt(self) -> str:

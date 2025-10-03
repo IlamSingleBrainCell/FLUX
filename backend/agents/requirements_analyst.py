@@ -4,7 +4,7 @@ from .base_agent import BaseSDLCAgent
 class RequirementsAnalyst(BaseSDLCAgent):
     def __init__(self):
         super().__init__(
-            name="Sara",
+            name="Messi ⚽",
             role="requirements_analyst",
             expertise=["Requirements Gathering", "Stakeholder Analysis", "User Stories", "Acceptance Criteria"]
         )
