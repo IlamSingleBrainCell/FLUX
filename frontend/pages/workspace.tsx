@@ -1,5 +1,5 @@
 // pages/workspace.tsx - AI Agent Collaboration Workspace (REDESIGNED)
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { AgentInfo, UploadedFile } from '../types/agents';
@@ -8,6 +8,16 @@ import { DocumentUpload } from '../components/DocumentUpload/DocumentUpload';
 import { GitHubAuth } from '../components/GitHub/GitHubAuth';
 import { GitHubRepoBrowser } from '../components/GitHub/GitHubRepoBrowser';
 import { AgentDropdown, getDefaultAgent, getAllAgents } from '../components/AgentChat/AgentDropdown';
+import { MarkdownRenderer } from '../components/AgentChat/MarkdownRenderer';
+import { ConversationSidebar } from '../components/AgentChat/ConversationSidebar';
+import {
+  saveConversation,
+  loadConversation,
+  getCurrentConversationId,
+  createNewConversation,
+  generateConversationTitle,
+  Conversation,
+} from '../utils/conversationStorage';
 
 interface Message {
   id: string;
@@ -54,6 +64,88 @@ export default function Workspace() {
   // Agent selection state (GitHub Copilot style)
   const [selectedAgent, setSelectedAgent] = useState(getDefaultAgent());
   const [chatMode, setChatMode] = useState<'single' | 'team'>('team'); // single agent or team collaboration
+
+  // Message persistence state
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [showConversationSidebar, setShowConversationSidebar] = useState(false);
+  
+  // Streaming state
+  const [streamingMessage, setStreamingMessage] = useState<{
+    agentId: string;
+    agentName: string;
+    content: string;
+  } | null>(null);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load conversation on mount
+  useEffect(() => {
+    const loadInitialConversation = async () => {
+      const savedId = getCurrentConversationId();
+      if (savedId) {
+        const conversation = await loadConversation(savedId);
+        if (conversation) {
+          setCurrentConversationId(conversation.id);
+          setMessages(conversation.messages);
+          setChatMode(conversation.mode);
+          if (conversation.selectedAgent) {
+            const agent = getAllAgents().find(a => a.id === conversation.selectedAgent);
+            if (agent) setSelectedAgent(agent);
+          }
+          setShowWelcome(conversation.messages.length === 0);
+        }
+      }
+    };
+    loadInitialConversation();
+  }, []);
+
+  // Auto-save conversation when messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      const saveCurrentConversation = async () => {
+        const conversation: Conversation = {
+          id: currentConversationId || createNewConversation(chatMode, selectedAgent.id).id,
+          title: generateConversationTitle(messages),
+          messages,
+          createdAt: currentConversationId ? (await loadConversation(currentConversationId))?.createdAt || new Date().toISOString() : new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          mode: chatMode,
+          selectedAgent: selectedAgent.id,
+        };
+        await saveConversation(conversation);
+        if (!currentConversationId) {
+          setCurrentConversationId(conversation.id);
+        }
+      };
+      saveCurrentConversation();
+    }
+  }, [messages, chatMode, selectedAgent, currentConversationId]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, streamingMessage]);
+
+  // Conversation management functions
+  const handleNewConversation = () => {
+    const newConv = createNewConversation(chatMode, selectedAgent.id);
+    setCurrentConversationId(newConv.id);
+    setMessages([]);
+    setShowWelcome(true);
+    setUploadedFiles([]);
+  };
+
+  const handleSelectConversation = async (conversation: Conversation) => {
+    setCurrentConversationId(conversation.id);
+    setMessages(conversation.messages);
+    setChatMode(conversation.mode);
+    if (conversation.selectedAgent) {
+      const agent = getAllAgents().find(a => a.id === conversation.selectedAgent);
+      if (agent) setSelectedAgent(agent);
+    }
+    setShowWelcome(conversation.messages.length === 0);
+  };
 
   // Simulate agent coming online when called
   const bringAgentOnline = (agentId: string) => {
@@ -296,7 +388,32 @@ export default function Workspace() {
 
         {/* Main Workspace - 3 Column Layout */}
         <div className="max-w-[1800px] mx-auto px-6 py-6">
-          <div className="grid grid-cols-12 gap-6 h-[calc(100vh-140px)]">
+          <div className="flex gap-6 h-[calc(100vh-140px)]">
+            
+            {/* Conversation Sidebar - Desktop: Always visible, Mobile: Drawer */}
+            <div className="hidden lg:block">
+              <ConversationSidebar
+                currentConversationId={currentConversationId}
+                onSelectConversation={handleSelectConversation}
+                onNewConversation={handleNewConversation}
+                isOpen={true}
+                onClose={() => {}}
+              />
+            </div>
+
+            {/* Mobile Conversation Sidebar */}
+            {showConversationSidebar && (
+              <ConversationSidebar
+                currentConversationId={currentConversationId}
+                onSelectConversation={handleSelectConversation}
+                onNewConversation={handleNewConversation}
+                isOpen={showConversationSidebar}
+                onClose={() => setShowConversationSidebar(false)}
+              />
+            )}
+
+            {/* Main Grid */}
+            <div className="flex-1 grid grid-cols-12 gap-6">
             
             {/* LEFT SIDEBAR - Team Members */}
             <div className="col-span-3 space-y-4">
@@ -384,16 +501,39 @@ export default function Workspace() {
                 {/* Chat Header */}
                 <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-lg font-bold text-slate-900">Conversation</h2>
-                      <p className="text-sm text-slate-500">{messages.length} messages</p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setShowConversationSidebar(true)}
+                        className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                        title="Show conversations"
+                      >
+                        <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                      </button>
+                      <div>
+                        <h2 className="text-lg font-bold text-slate-900">Conversation</h2>
+                        <p className="text-sm text-slate-500">{messages.length} messages</p>
+                      </div>
                     </div>
-                    <button 
-                      onClick={() => setMessages([])}
-                      className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg text-sm transition-colors"
-                    >
-                      Clear Chat
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={handleNewConversation}
+                        className="px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg text-sm transition-colors flex items-center gap-1.5"
+                        title="New chat"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        New
+                      </button>
+                      <button 
+                        onClick={() => setMessages([])}
+                        className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg text-sm transition-colors"
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -462,7 +602,11 @@ export default function Workspace() {
                                 ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white' 
                                 : 'bg-slate-100 text-slate-900'
                             } shadow-sm`}>
-                              <p className="text-sm leading-relaxed">{msg.content}</p>
+                              {msg.isUser ? (
+                                <p className="text-sm leading-relaxed">{msg.content}</p>
+                              ) : (
+                                <MarkdownRenderer content={msg.content} />
+                              )}
                             </div>
                             {msg.artifact && (
                               <button 
@@ -479,6 +623,36 @@ export default function Workspace() {
                       </div>
                     </div>
                   ))}
+
+                  {/* Streaming Message */}
+                  {streamingMessage && (
+                    <div className="flex justify-start">
+                      <div className="max-w-[75%]">
+                        <div className="flex items-start space-x-2 mb-1">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
+                            {enterpriseAgents.find(a => a.id === streamingMessage.agentId)?.avatar || '🤖'}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <span className="text-xs font-semibold text-slate-900">{streamingMessage.agentName}</span>
+                              <span className="text-xs text-slate-400">Typing...</span>
+                            </div>
+                            <div className="px-4 py-3 rounded-2xl bg-slate-100 text-slate-900 shadow-sm">
+                              <MarkdownRenderer content={streamingMessage.content} />
+                              <div className="flex gap-1 mt-2">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Scroll anchor */}
+                  <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input Area */}
@@ -673,8 +847,9 @@ export default function Workspace() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+            </div> {/* Close Main Grid grid-cols-12 */}
+          </div> {/* Close Flex Container */}
+        </div> {/* Close Max-Width Container */}
 
         {/* Document Upload Modal */}
         {showUploadModal && (
@@ -788,7 +963,7 @@ export default function Workspace() {
             </div>
           </div>
         )}
-      </div>
+      </div> {/* Close min-h-screen Div */}
     </>
   );
 }
