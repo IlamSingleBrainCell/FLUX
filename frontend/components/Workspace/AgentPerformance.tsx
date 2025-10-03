@@ -54,7 +54,7 @@ export const AgentPerformance: React.FC<AgentPerformanceProps> = ({
     <div className={`bg-white rounded-xl border border-slate-200 ${className}`}>
       {/* Header */}
       <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,37 +67,43 @@ export const AgentPerformance: React.FC<AgentPerformanceProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Calculation Info Button */}
-            <button
-              onClick={() => setShowCalculationInfo(!showCalculationInfo)}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1.5"
-              title="How metrics are calculated"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>How it's calculated</span>
-            </button>
-
-            {/* Time Range Selector */}
-            <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-              {(['24h', '7d', '30d'] as const).map(range => (
-                <button
-                  key={range}
-                  onClick={() => setSelectedTimeRange(range)}
-                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                    selectedTimeRange === range
-                      ? 'bg-white text-slate-900 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  {range === '24h' ? 'Today' : range === '7d' ? 'Week' : 'Month'}
-                </button>
-              ))}
-            </div>
+          {/* Time Range Selector */}
+          <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+            {(['24h', '7d', '30d'] as const).map(range => (
+              <button
+                key={range}
+                onClick={() => setSelectedTimeRange(range)}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  selectedTimeRange === range
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {range === '24h' ? 'Today' : range === '7d' ? 'Week' : 'Month'}
+              </button>
+            ))}
           </div>
         </div>
+
+        {/* Calculation Info Button - Full Width Row */}
+        <button
+          onClick={() => setShowCalculationInfo(!showCalculationInfo)}
+          className="w-full mt-2 px-3 py-2 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors flex items-center justify-center gap-1.5 border border-blue-200"
+          title="How metrics are calculated"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>How it's calculated</span>
+          <svg 
+            className={`w-4 h-4 transition-transform ${showCalculationInfo ? 'rotate-180' : ''}`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
 
         {/* Calculation Info Panel */}
         {showCalculationInfo && (
