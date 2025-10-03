@@ -37,8 +37,8 @@ const SUPPORTED_FORMATS = {
 
 export const DocumentUpload: React.FC<DocumentUploadProps> = ({
   onFilesUploaded,
-  maxFiles = 10,
-  maxFileSize = 30 * 1024 * 1024, // 30MB
+  maxFiles = 5,
+  maxFileSize = 2 * 1024 * 1024, // 2MB (Vercel serverless limit)
   className = ''
 }) => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);

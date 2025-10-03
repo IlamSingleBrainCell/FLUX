@@ -38,10 +38,10 @@ class handler(BaseHTTPRequestHandler):
                     
                     # Extract text content for analysis
                     if file_type.startswith('text/') or file_type == 'application/json':
-                        # Text-based files - include first 5000 chars
-                        preview = file_content[:5000] if len(file_content) > 5000 else file_content
+                        # Text-based files - include first 2000 chars (reduced for Vercel limits)
+                        preview = file_content[:2000] if len(file_content) > 2000 else file_content
                         document_context += f"Content Preview:\n{preview}\n"
-                        if len(file_content) > 5000:
+                        if len(file_content) > 2000:
                             document_context += f"... (truncated, total length: {len(file_content)} characters)\n"
                     else:
                         document_context += f"Binary file - metadata only\n"

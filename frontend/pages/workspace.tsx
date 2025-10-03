@@ -141,6 +141,19 @@ export default function Workspace() {
         }),
       });
 
+      // Handle HTTP 413 Payload Too Large
+      if (response.status === 413) {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          agentId: 'system',
+          agentName: 'System Error',
+          agent: 'system',
+          content: '❌ Upload failed: Files are too large. Please reduce file size or upload fewer files. Maximum: 2MB per file, 5 files total.',
+          timestamp: new Date().toISOString()
+        }]);
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
