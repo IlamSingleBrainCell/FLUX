@@ -1843,17 +1843,18 @@ sonar-scanner -Dsonar.projectKey=myapp
                                 all_responses.append(response_obj)
                                 
                                 # Check if this response mentions other agents (for next round)
+                                # Only add mentioned agents in Team Mode to prevent multiple agents in Single Mode
                                 mentioned_agents = []
                                 for check_agent in agent_configs.keys():
                                     if check_agent != agent_key and check_agent in ai_response.lower():
                                         mentioned_agents.append(check_agent)
                                 
-                                if mentioned_agents:
+                                if mentioned_agents and chat_mode == 'team':
                                     # Add mentioned agents to next round if not already there
                                     for mentioned in mentioned_agents:
                                         if mentioned not in responding_agents:
                                             responding_agents.append(mentioned)
-                                
+                            
                             except Exception as agent_error:
                                 round_responses.append({
                                     "agent": agent_key,
