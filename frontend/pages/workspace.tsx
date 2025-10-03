@@ -388,20 +388,9 @@ export default function Workspace() {
 
         {/* Main Workspace - 3 Column Layout */}
         <div className="max-w-[1800px] mx-auto px-6 py-6">
-          <div className="flex gap-6 h-[calc(100vh-140px)]">
+          <div className="relative h-[calc(100vh-140px)]">
             
-            {/* Conversation Sidebar - Desktop: Always visible, Mobile: Drawer */}
-            <div className="hidden lg:block">
-              <ConversationSidebar
-                currentConversationId={currentConversationId}
-                onSelectConversation={handleSelectConversation}
-                onNewConversation={handleNewConversation}
-                isOpen={true}
-                onClose={() => {}}
-              />
-            </div>
-
-            {/* Mobile Conversation Sidebar */}
+            {/* Conversation Sidebar - Overlay on all screens */}
             {showConversationSidebar && (
               <ConversationSidebar
                 currentConversationId={currentConversationId}
@@ -412,8 +401,8 @@ export default function Workspace() {
               />
             )}
 
-            {/* Main Grid */}
-            <div className="flex-1 grid grid-cols-12 gap-6">
+            {/* Main Grid - Full width */}
+            <div className="grid grid-cols-12 gap-6 h-full">
             
             {/* LEFT SIDEBAR - Team Members */}
             <div className="col-span-3 space-y-4">
@@ -504,7 +493,7 @@ export default function Workspace() {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setShowConversationSidebar(true)}
-                        className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                         title="Show conversations"
                       >
                         <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
