@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { AgentInfo } from '../types/agents';
+import { AgentInfo, UploadedFile } from '../types/agents';
 import { enterpriseAgents } from '../config/agents';
+import { DocumentUpload } from '../components/DocumentUpload/DocumentUpload';
 
 interface Message {
   id: string;
@@ -39,6 +40,8 @@ export default function Workspace() {
   );
   const [selectedArtifact, setSelectedArtifact] = useState<Message['artifact'] | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   // Simulate agent coming online when called
   const bringAgentOnline = (agentId: string) => {
@@ -133,7 +136,8 @@ export default function Workspace() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          message: messageToSend 
+          message: messageToSend,
+          uploaded_files: uploadedFiles // Include uploaded files
         }),
       });
 
@@ -439,7 +443,38 @@ export default function Workspace() {
 
                 {/* Input Area */}
                 <div className="px-6 py-4 border-t border-slate-200 bg-slate-50">
+                  {/* Uploaded Files Preview */}
+                  {uploadedFiles.length > 0 && (
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {uploadedFiles.map((file) => (
+                        <div
+                          key={file.id}
+                          className="inline-flex items-center space-x-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm"
+                        >
+                          <span className="text-blue-600">📎</span>
+                          <span className="text-blue-900 font-medium truncate max-w-[200px]">{file.name}</span>
+                          <button
+                            onClick={() => setUploadedFiles(prev => prev.filter(f => f.id !== file.id))}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
                   <div className="flex items-end space-x-3">
+                    {/* Upload Button */}
+                    <button
+                      onClick={() => setShowUploadModal(true)}
+                      className="px-4 py-3 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors flex items-center space-x-2"
+                      title="Upload documents"
+                    >
+                      <span className="text-xl">📎</span>
+                      <span className="text-sm font-medium text-slate-700">Upload</span>
+                    </button>
+                    
                     <textarea
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
@@ -532,6 +567,61 @@ export default function Workspace() {
             </div>
           </div>
         </div>
+
+        {/* Document Upload Modal */}
+        {showUploadModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-900">Upload Project Documents</h2>
+                <button
+                  onClick={() => setShowUploadModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+                <DocumentUpload
+                  onFilesUploaded={(files) => {
+                    setUploadedFiles(files);
+                    if (files.length > 0) {
+                      setShowUploadModal(false);
+                      // Auto-populate message
+                      setInputMessage(`I've uploaded ${files.length} document(s): ${files.map(f => f.name).join(', ')}. Please analyze and provide insights based on your role.`);
+                    }
+                  }}
+                  maxFiles={10}
+                  maxFileSize={30 * 1024 * 1024}
+                />
+              </div>
+              
+              <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowUploadModal(false)}
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowUploadModal(false);
+                    if (uploadedFiles.length > 0) {
+                      setInputMessage(`I've uploaded ${uploadedFiles.length} document(s). Please analyze and provide insights.`);
+                    }
+                  }}
+                  disabled={uploadedFiles.length === 0}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
