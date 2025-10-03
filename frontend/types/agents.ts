@@ -7,6 +7,9 @@ export interface UploadedFile {
   content?: string;
   url?: string;
   uploadedAt: string;
+  source?: 'local' | 'github';
+  repo?: string;
+  path?: string;
 }
 
 export interface AgentMessage {
