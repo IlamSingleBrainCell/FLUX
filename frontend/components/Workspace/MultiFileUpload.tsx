@@ -72,6 +72,7 @@ export const MultiFileUpload: React.FC<MultiFileUploadProps> = ({
       const content = await file.text();
       
       newFiles.push({
+        id: `file-${Date.now()}-${i}`,
         name: file.name,
         type: file.type || 'text/plain',
         size: file.size,

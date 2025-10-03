@@ -214,18 +214,6 @@ export default function Workspace() {
     setShowTemplates(false);
   };
 
-  // Setup keyboard shortcuts
-  const shortcuts = [
-    { key: 'Ctrl+N', description: 'New conversation', action: handleNewConversation, category: 'chat' },
-    { key: 'Ctrl+H', description: 'Toggle history', action: () => setShowConversationSidebar(!showConversationSidebar), category: 'navigation' },
-    { key: 'Ctrl+/', description: 'Show shortcuts', action: () => setShowShortcuts(true), category: 'navigation' },
-    { key: 'Ctrl+T', description: 'Template library', action: () => setShowTemplates(true), category: 'chat' },
-    { key: 'Ctrl+Enter', description: 'Send message', action: handleSendMessage, category: 'chat' },
-    { key: 'Escape', description: 'Close modals', action: () => { setShowShortcuts(false); setShowTemplates(false); }, category: 'navigation' },
-  ];
-
-  useKeyboardShortcuts(shortcuts);
-
   // Simulate agent coming online when called
   const bringAgentOnline = (agentId: string) => {
     setAgentStatuses(prev => 
@@ -415,6 +403,18 @@ export default function Workspace() {
       );
     }
   };
+
+  // Setup keyboard shortcuts (after handleSendMessage is defined)
+  const shortcuts = [
+    { key: 'Ctrl+N', description: 'New conversation', action: handleNewConversation, category: 'chat' as const },
+    { key: 'Ctrl+H', description: 'Toggle history', action: () => setShowConversationSidebar(!showConversationSidebar), category: 'navigation' as const },
+    { key: 'Ctrl+/', description: 'Show shortcuts', action: () => setShowShortcuts(true), category: 'navigation' as const },
+    { key: 'Ctrl+T', description: 'Template library', action: () => setShowTemplates(true), category: 'chat' as const },
+    { key: 'Ctrl+Enter', description: 'Send message', action: handleSendMessage, category: 'chat' as const },
+    { key: 'Escape', description: 'Close modals', action: () => { setShowShortcuts(false); setShowTemplates(false); }, category: 'navigation' as const },
+  ];
+
+  useKeyboardShortcuts(shortcuts);
 
   const getAgentStatus = (agentId: string) => {
     return agentStatuses.find(s => s.id === agentId)?.status || 'offline';
