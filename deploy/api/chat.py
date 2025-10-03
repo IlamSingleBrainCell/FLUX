@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler
 import json
 import os
 from datetime import datetime
+import asyncio
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -45,7 +46,8 @@ class handler(BaseHTTPRequestHandler):
                     else:
                         document_context += f"Binary file - metadata only\n"
                 
-                document_context += "\nPlease analyze these documents based on your role and provide relevant insights, artifacts, or recommendations.\n"
+                # Add to message for A2A discussion
+                message = f"{message}\n\n{document_context}\n\n🤝 TEAM COLLABORATION:\nPlease discuss this document among yourselves. The Project Manager (Modric) should coordinate task allocation based on the document content. Each agent should:\n1. Share your initial analysis of the document\n2. Identify which parts are relevant to your role\n3. Coordinate with other team members who you need to work with\n4. Mention team members by name when you need their input (e.g., '@Neymar can you implement this?')\n5. Provide your role-specific artifact or deliverable"
             
             # Agent definitions with Groq models
             agent_configs = {
@@ -53,43 +55,109 @@ class handler(BaseHTTPRequestHandler):
                     "name": "Messi ⚽",
                     "role": "Requirements Analyst",
                     "model": "llama-3.3-70b-versatile",
-                    "system_prompt": "You are Messi ⚽, a Requirements Analyst with deep expertise in gathering and documenting project requirements. When analyzing uploaded documents (specifications, user feedback, business docs), extract and create: 1) User stories with acceptance criteria, 2) Functional and non-functional requirements, 3) Use case diagrams descriptions, 4) Requirements traceability matrix. You're methodical, detail-oriented, and excellent at translating business needs into technical specifications. Always provide structured, actionable requirements artifacts."
+                    "system_prompt": """You are Messi ⚽, a Requirements Analyst. When documents are uploaded:
+1. ANALYZE: Extract requirements, user stories, business needs
+2. DISCUSS: Share findings with team - mention @Ronaldo for architecture needs, @Neymar for code needs
+3. CREATE: Generate requirements artifacts (user stories, acceptance criteria, functional requirements)
+4. COORDINATE: Tell other agents which requirements they should focus on
+
+In team collaboration, actively communicate with:
+- @Ronaldo (Architect) - share system requirements
+- @Neymar (Developer) - clarify implementation requirements  
+- @Modric (PM) - confirm scope and priorities"""
                 },
                 "ronaldo": {
                     "name": "Ronaldo ⚽",
                     "role": "Software Architect",
                     "model": "llama-3.1-8b-instant",
-                    "system_prompt": "You are Ronaldo ⚽, a Software Architect with expertise in system design and architecture patterns. When analyzing uploaded documents (requirements, technical specs, existing architecture docs), create: 1) System architecture diagrams (describe components), 2) Database schema designs, 3) API specifications, 4) Technology stack recommendations, 5) Architecture decision records (ADRs). You design scalable, maintainable systems and provide detailed technical blueprints."
+                    "system_prompt": """You are Ronaldo ⚽, a Software Architect. When documents are uploaded:
+1. ANALYZE: Review requirements, design system architecture
+2. DISCUSS: Mention @Messi for requirements clarification, @Neymar for implementation approach
+3. CREATE: Architecture diagrams, database schemas, API specs, technology recommendations
+4. COORDINATE: Guide @Neymar on architecture decisions, consult @Ramos on security
+
+In team collaboration, actively communicate with:
+- @Messi (Requirements) - validate requirements understanding
+- @Neymar (Developer) - provide technical direction
+- @Ramos (Security) - review security architecture"""
                 },
                 "neymar": {
                     "name": "Neymar ⚽",
                     "role": "Senior Developer",
                     "model": "llama-3.1-70b-versatile",
-                    "system_prompt": "You are Neymar ⚽, a Senior Developer skilled in writing clean, efficient code. When analyzing uploaded documents (requirements, specs, code files), generate: 1) Complete code implementations, 2) Code refactoring suggestions, 3) Bug fixes with explanations, 4) Code review comments, 5) Implementation guides. Support multiple languages (Python, Java, JavaScript, etc.). Provide working, production-ready code with best practices."
+                    "system_prompt": """You are Neymar ⚽, a Senior Developer. When documents are uploaded:
+1. ANALYZE: Review requirements and architecture for implementation
+2. DISCUSS: Ask @Messi for requirement clarifications, @Ronaldo for architecture guidance
+3. CREATE: Working code implementations, refactoring suggestions, code examples
+4. COORDINATE: Request @Mbappé for test coverage, @Benzema for deployment needs
+
+In team collaboration, actively communicate with:
+- @Ronaldo (Architect) - confirm technical approach
+- @Mbappé (QA) - discuss testability
+- @Ramos (Security) - verify secure coding practices"""
                 },
                 "mbappe": {
                     "name": "Mbappé ⚽",
                     "role": "QA Engineer",
                     "model": "llama-3.1-8b-instant",
-                    "system_prompt": "You are Mbappé ⚽, a QA Engineer focused on software quality and testing. When analyzing uploaded documents (requirements, code, test plans), create: 1) Comprehensive test plans, 2) Test cases (unit, integration, E2E), 3) Test automation scripts, 4) Bug reports with reproduction steps, 5) Quality metrics and coverage reports. You ensure thorough testing across all scenarios."
+                    "system_prompt": """You are Mbappé ⚽, a QA Engineer. When documents are uploaded:
+1. ANALYZE: Review requirements and code for testing needs
+2. DISCUSS: Ask @Messi for acceptance criteria, @Neymar for code structure
+3. CREATE: Test plans, test cases, automation scripts, quality reports
+4. COORDINATE: Work with @Neymar on testability, @Modric on test timelines
+
+In team collaboration, actively communicate with:
+- @Messi (Requirements) - verify test coverage matches requirements
+- @Neymar (Developer) - discuss test scenarios
+- @Benzema (DevOps) - coordinate test automation in CI/CD"""
                 },
                 "benzema": {
                     "name": "Benzema ⚽",
                     "role": "DevOps Engineer",
                     "model": "llama-3.1-8b-instant",
-                    "system_prompt": "You are Benzema ⚽, a DevOps Engineer expert in CI/CD and infrastructure. When analyzing uploaded documents (deployment specs, config files, infrastructure docs), provide: 1) CI/CD pipeline configurations (GitHub Actions, Jenkins), 2) Docker/Kubernetes manifests, 3) Infrastructure as Code (Terraform, CloudFormation), 4) Deployment strategies, 5) Monitoring and logging setup. Focus on automation and reliability."
+                    "system_prompt": """You are Benzema ⚽, a DevOps Engineer. When documents are uploaded:
+1. ANALYZE: Review architecture and deployment requirements
+2. DISCUSS: Ask @Ronaldo for infrastructure needs, @Neymar for build requirements
+3. CREATE: CI/CD configs, Docker/K8s manifests, IaC templates, deployment strategies
+4. COORDINATE: Work with @Mbappé on test automation, @Ramos on security scanning
+
+In team collaboration, actively communicate with:
+- @Ronaldo (Architect) - confirm infrastructure design
+- @Neymar (Developer) - discuss build and deployment process
+- @Ramos (Security) - integrate security tools in pipeline"""
                 },
                 "modric": {
                     "name": "Modric ⚽",
                     "role": "Project Manager",
                     "model": "llama-3.1-8b-instant",
-                    "system_prompt": "You are Modric ⚽, a Project Manager skilled in planning and coordination. When analyzing uploaded documents (project plans, timelines, team docs), create: 1) Project schedules with milestones, 2) Resource allocation plans, 3) Risk assessment matrices, 4) Sprint/iteration plans, 5) Stakeholder communication templates. You ensure projects stay on track and teams remain productive."
+                    "system_prompt": """You are Modric ⚽, a Project Manager and Team Coordinator. When documents are uploaded:
+1. ANALYZE: Understand project scope, timelines, resources needed
+2. DISCUSS: Coordinate all team members - assign tasks based on their roles
+3. CREATE: Project plans, sprint schedules, task breakdown, risk assessment
+4. COORDINATE: YOU ARE THE COORDINATOR - explicitly assign tasks:
+   - "@Messi - please extract requirements from this document"
+   - "@Ronaldo - design the architecture based on Messi's requirements"
+   - "@Neymar - implement the features Ronaldo designed"
+   - "@Mbappé - create tests for Neymar's code"
+   - "@Benzema - set up CI/CD for deployment"
+   - "@Ramos - review security throughout"
+
+YOUR PRIMARY JOB: When documents are uploaded, READ them and DELEGATE tasks to specific team members by mentioning them by name. Create a clear workflow."""
                 },
                 "ramos": {
                     "name": "Ramos ⚽",
                     "role": "Security Expert",
                     "model": "llama-3.1-8b-instant",
-                    "system_prompt": "You are Ramos ⚽, a Security Expert focused on application security and threat modeling. When analyzing uploaded documents (code, architecture, security policies), provide: 1) Security vulnerability assessments, 2) Threat modeling reports, 3) Security best practices recommendations, 4) Compliance checklists (OWASP, GDPR), 5) Security code review findings. You identify and mitigate security risks comprehensively."
+                    "system_prompt": """You are Ramos ⚽, a Security Expert. When documents are uploaded:
+1. ANALYZE: Identify security requirements, vulnerabilities, compliance needs
+2. DISCUSS: Alert @Ronaldo about security architecture, @Neymar about secure coding
+3. CREATE: Security assessments, threat models, compliance checklists, security recommendations
+4. COORDINATE: Work with @Ronaldo on security design, @Benzema on security tools
+
+In team collaboration, actively communicate with:
+- @Ronaldo (Architect) - review architecture security
+- @Neymar (Developer) - conduct code security reviews
+- @Benzema (DevOps) - integrate security scanning and monitoring"""
                 }
             }
             
@@ -113,9 +181,10 @@ class handler(BaseHTTPRequestHandler):
             if "ramos" in message_lower or "security" in message_lower:
                 responding_agents.append("ramos")
             
-            # Check for team/everyone calls
-            if "team" in message_lower or "everyone" in message_lower or "all" in message_lower:
-                responding_agents = ["messi", "ronaldo", "neymar", "mbappe", "benzema", "modric", "ramos"]
+            # Check for team/everyone calls OR document upload (trigger full team)
+            if "team" in message_lower or "everyone" in message_lower or "all" in message_lower or uploaded_files:
+                responding_agents = ["modric", "messi", "ronaldo", "neymar", "mbappe", "benzema", "ramos"]
+                # Modric first to coordinate
             
             # Default to Modric if no specific agent mentioned
             if not responding_agents:
@@ -128,43 +197,87 @@ class handler(BaseHTTPRequestHandler):
                     from groq import Groq
                     client = Groq(api_key=groq_api_key)
                     
-                    for agent_key in responding_agents:
-                        agent_config = agent_configs.get(agent_key)
-                        if not agent_config:
-                            continue
+                    # MULTI-ROUND COLLABORATION - Agents discuss among themselves
+                    max_rounds = 3 if uploaded_files else 1  # More rounds for document analysis
+                    all_responses = []
+                    
+                    for round_num in range(max_rounds):
+                        round_responses = []
                         
-                        try:
-                            chat_completion = client.chat.completions.create(
-                                messages=[
-                                    {"role": "system", "content": agent_config["system_prompt"]},
-                                    {"role": "user", "content": message}
-                                ],
-                                model=agent_config["model"],
-                                max_tokens=500,
-                                temperature=0.7
-                            )
+                        # Build conversation context from previous rounds
+                        conversation_history = ""
+                        if all_responses:
+                            conversation_history = "\n\n💬 PREVIOUS TEAM DISCUSSION:\n"
+                            for prev_response in all_responses:
+                                conversation_history += f"\n{prev_response['agent_name']}: {prev_response['message']}\n"
+                            conversation_history += "\n📢 Based on the above discussion, continue collaborating. If another agent mentioned you or asked you something, respond to them directly.\n"
+                        
+                        for agent_key in responding_agents:
+                            agent_config = agent_configs.get(agent_key)
+                            if not agent_config:
+                                continue
                             
-                            ai_response = chat_completion.choices[0].message.content
-                            
-                            responses.append({
-                                "agent": agent_key,
-                                "agent_name": f"{agent_config['name']} ({agent_config['role']})",
-                                "message": ai_response,
-                                "timestamp": datetime.utcnow().isoformat() + "Z"
-                            })
-                        except Exception as agent_error:
-                            responses.append({
-                                "agent": agent_key,
-                                "agent_name": f"{agent_config['name']} ({agent_config['role']})",
-                                "message": f"I encountered an error processing your request: {str(agent_error)}",
-                                "timestamp": datetime.utcnow().isoformat() + "Z",
-                                "error": str(agent_error)
-                            })
+                            try:
+                                # Add conversation history to message for context
+                                full_message = message + conversation_history
+                                
+                                chat_completion = client.chat.completions.create(
+                                    messages=[
+                                        {"role": "system", "content": agent_config["system_prompt"]},
+                                        {"role": "user", "content": full_message}
+                                    ],
+                                    model=agent_config["model"],
+                                    max_tokens=800,  # More tokens for collaboration
+                                    temperature=0.7
+                                )
+                                
+                                ai_response = chat_completion.choices[0].message.content
+                                
+                                response_obj = {
+                                    "agent": agent_key,
+                                    "agent_name": f"{agent_config['name']} ({agent_config['role']})",
+                                    "message": ai_response,
+                                    "timestamp": datetime.utcnow().isoformat() + "Z",
+                                    "round": round_num + 1
+                                }
+                                
+                                round_responses.append(response_obj)
+                                all_responses.append(response_obj)
+                                
+                                # Check if this response mentions other agents (for next round)
+                                mentioned_agents = []
+                                for check_agent in agent_configs.keys():
+                                    if check_agent != agent_key and check_agent in ai_response.lower():
+                                        mentioned_agents.append(check_agent)
+                                
+                                if mentioned_agents:
+                                    # Add mentioned agents to next round if not already there
+                                    for mentioned in mentioned_agents:
+                                        if mentioned not in responding_agents:
+                                            responding_agents.append(mentioned)
+                                
+                            except Exception as agent_error:
+                                round_responses.append({
+                                    "agent": agent_key,
+                                    "agent_name": f"{agent_config['name']} ({agent_config['role']})",
+                                    "message": f"I encountered an error: {str(agent_error)}",
+                                    "timestamp": datetime.utcnow().isoformat() + "Z",
+                                    "error": str(agent_error),
+                                    "round": round_num + 1
+                                })
+                        
+                        # If no new agents mentioned, stop early
+                        if round_num > 0 and len(round_responses) == 0:
+                            break
+                    
+                    responses = all_responses
                     
                     response_data = {
                         "responses": responses,
                         "groq_configured": True,
-                        "agents_responded": len(responses)
+                        "agents_responded": len(responses),
+                        "collaboration_rounds": max_rounds,
+                        "documents_analyzed": len(uploaded_files)
                     }
                 except ImportError:
                     response_data = {
