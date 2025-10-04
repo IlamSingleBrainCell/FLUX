@@ -551,9 +551,9 @@ export default function Workspace() {
         <meta name="description" content="Collaborate with AI agents on your SDLC tasks" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         {/* Header */}
-        <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50 shadow-lg">
           <div className="max-w-[1800px] mx-auto px-6 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -565,22 +565,22 @@ export default function Workspace() {
                   </div>
                 </Link>
                 <div>
-                  <h1 className="text-lg font-bold text-slate-900">AI Collaboration Workspace</h1>
-                  <p className="text-xs text-slate-500">Real-time SDLC Agent Assistance</p>
+                  <h1 className="text-lg font-bold text-white">AI Collaboration Workspace</h1>
+                  <p className="text-xs text-slate-400">Real-time SDLC Agent Assistance</p>
                 </div>
               </div>
 
               <nav className="flex space-x-2">
-                <Link href="/dashboard" className="px-3 py-1.5 text-slate-600 rounded-lg text-sm hover:bg-slate-100 transition-colors">
+                <Link href="/dashboard" className="px-3 py-1.5 text-slate-300 rounded-lg text-sm hover:bg-slate-800 hover:text-white transition-colors">
                   Dashboard
                 </Link>
-                <Link href="/projects" className="px-3 py-1.5 text-slate-600 rounded-lg text-sm hover:bg-slate-100 transition-colors">
+                <Link href="/projects" className="px-3 py-1.5 text-slate-300 rounded-lg text-sm hover:bg-slate-800 hover:text-white transition-colors">
                   Projects
                 </Link>
-                <Link href="/workspace" className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm shadow-sm">
+                <Link href="/workspace" className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg text-sm shadow-lg shadow-blue-500/30">
                   Workspace
                 </Link>
-                <Link href="/artifacts" className="px-3 py-1.5 text-slate-600 rounded-lg text-sm hover:bg-slate-100 transition-colors flex items-center gap-1">
+                <Link href="/artifacts" className="px-3 py-1.5 text-slate-300 rounded-lg text-sm hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-1">
                   <span>📦</span>
                   Artifacts
                 </Link>
@@ -609,9 +609,9 @@ export default function Workspace() {
             
             {/* LEFT SIDEBAR - Team Members */}
             <div className="col-span-3 space-y-4">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-                <h2 className="text-sm font-bold text-slate-900 mb-3 flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-slate-700/50 p-4">
+                <h2 className="text-sm font-bold text-white mb-3 flex items-center">
+                  <svg className="w-4 h-4 mr-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                   Team Members
@@ -621,12 +621,12 @@ export default function Workspace() {
                   {enterpriseAgents.map(agent => {
                     const status = getAgentStatus(agent.id);
                     return (
-                      <div key={agent.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                      <div key={agent.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer">
                         <div className="relative">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold text-lg shadow-md">
                             {agent.avatar}
                           </div>
-                          <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                          <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-800 ${
                             status === 'online' ? 'bg-emerald-500' :
                             status === 'typing' ? 'bg-yellow-500 animate-pulse' :
                             status === 'thinking' ? 'bg-blue-500 animate-pulse' :
@@ -634,8 +634,8 @@ export default function Workspace() {
                           }`}></div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-slate-900">{agent.name}</div>
-                          <div className="text-xs text-slate-500 truncate">
+                          <div className="text-sm font-semibold text-white">{agent.name}</div>
+                          <div className="text-xs text-slate-400 truncate">
                             {status === 'online' ? 'Active now' :
                              status === 'typing' ? 'Typing...' :
                              status === 'thinking' ? 'Thinking...' :
@@ -647,17 +647,17 @@ export default function Workspace() {
                   })}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-slate-200">
-                  <div className="text-xs text-slate-500 space-y-1">
+                <div className="mt-4 pt-4 border-t border-slate-700">
+                  <div className="text-xs text-slate-400 space-y-1">
                     <div className="flex items-center justify-between">
                       <span>Online</span>
-                      <span className="font-semibold text-emerald-600">
+                      <span className="font-semibold text-emerald-400">
                         {agentStatuses.filter(s => s.status !== 'offline').length}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Total</span>
-                      <span className="font-semibold text-slate-900">{enterpriseAgents.length}</span>
+                      <span className="font-semibold text-white">{enterpriseAgents.length}</span>
                     </div>
                   </div>
                 </div>
@@ -679,22 +679,22 @@ export default function Workspace() {
               )}
 
               {/* Quick Actions */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-4">
-                <h3 className="text-sm font-bold text-slate-900 mb-3">Quick Actions</h3>
+              <div className="bg-gradient-to-br from-blue-900/30 to-indigo-900/30 rounded-xl border border-blue-700/30 p-4 backdrop-blur-sm">
+                <h3 className="text-sm font-bold text-white mb-3">Quick Actions</h3>
                 <div className="space-y-2">
-                  <button className="w-full px-3 py-2 bg-white text-slate-700 rounded-lg text-sm hover:shadow-md transition-all text-left flex items-center space-x-2">
+                  <button className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 text-slate-200 rounded-lg text-sm hover:bg-slate-700/50 hover:shadow-md transition-all text-left flex items-center space-x-2">
                     <span>📋</span>
                     <span>Create User Story</span>
                   </button>
-                  <button className="w-full px-3 py-2 bg-white text-slate-700 rounded-lg text-sm hover:shadow-md transition-all text-left flex items-center space-x-2">
+                  <button className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 text-slate-200 rounded-lg text-sm hover:bg-slate-700/50 hover:shadow-md transition-all text-left flex items-center space-x-2">
                     <span>🏗️</span>
                     <span>Design Architecture</span>
                   </button>
-                  <button className="w-full px-3 py-2 bg-white text-slate-700 rounded-lg text-sm hover:shadow-md transition-all text-left flex items-center space-x-2">
+                  <button className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 text-slate-200 rounded-lg text-sm hover:bg-slate-700/50 hover:shadow-md transition-all text-left flex items-center space-x-2">
                     <span>💻</span>
                     <span>Generate Code</span>
                   </button>
-                  <button className="w-full px-3 py-2 bg-white text-slate-700 rounded-lg text-sm hover:shadow-md transition-all text-left flex items-center space-x-2">
+                  <button className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 text-slate-200 rounded-lg text-sm hover:bg-slate-700/50 hover:shadow-md transition-all text-left flex items-center space-x-2">
                     <span>🔒</span>
                     <span>Security Audit</span>
                   </button>
@@ -704,23 +704,23 @@ export default function Workspace() {
 
             {/* CENTER - Chat Interface */}
             <div className="col-span-6 flex flex-col">
-              <div className="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-visible">
+              <div className="flex-1 bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-slate-700/50 flex flex-col overflow-visible">
                 {/* Chat Header */}
-                <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+                <div className="px-6 py-4 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setShowConversationSidebar(true)}
-                        className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
                         title="Show conversations"
                       >
-                        <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                       </button>
                       <div>
-                        <h2 className="text-lg font-bold text-slate-900">Conversation</h2>
-                        <p className="text-sm text-slate-500">{messages.length} messages</p>
+                        <h2 className="text-lg font-bold text-white">Conversation</h2>
+                        <p className="text-sm text-slate-400">{messages.length} messages</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -730,7 +730,7 @@ export default function Workspace() {
                       />
                       <button
                         onClick={() => setShowShortcuts(true)}
-                        className="px-3 py-1.5 hover:bg-slate-100 rounded-lg text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-1.5"
+                        className="px-3 py-1.5 hover:bg-slate-700/50 rounded-lg text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-1.5"
                         title="Keyboard shortcuts (Ctrl+/)"
                       >
                         <span>⌨️</span>
@@ -738,7 +738,7 @@ export default function Workspace() {
                       </button>
                       <button
                         onClick={() => setShowTemplates(true)}
-                        className="px-3 py-1.5 hover:bg-slate-100 rounded-lg text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-1.5"
+                        className="px-3 py-1.5 hover:bg-slate-700/50 rounded-lg text-sm text-slate-300 hover:text-white transition-colors flex items-center gap-1.5"
                         title="Prompt templates (Ctrl+T)"
                       >
                         <span>📚</span>
@@ -756,7 +756,7 @@ export default function Workspace() {
                       </button>
                       <button 
                         onClick={() => setMessages([])}
-                        className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg text-sm transition-colors"
+                        className="px-3 py-1.5 text-slate-300 hover:bg-slate-700/50 rounded-lg text-sm transition-colors"
                       >
                         Clear
                       </button>
@@ -773,31 +773,31 @@ export default function Workspace() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                         </svg>
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-2">Welcome to AI Workspace</h3>
-                      <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                      <h3 className="text-2xl font-bold text-white mb-2">Welcome to AI Workspace</h3>
+                      <p className="text-slate-400 mb-6 max-w-md mx-auto">
                         Start a conversation with our AI agents. They'll come online automatically when you need them.
                       </p>
                       <div className="grid grid-cols-2 gap-3 max-w-lg mx-auto">
                         <button 
                           onClick={() => setInputMessage("Help me create user stories for authentication")}
-                          className="p-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-left transition-colors border border-blue-200"
+                          className="p-3 bg-blue-900/30 hover:bg-blue-900/40 rounded-lg text-left transition-colors border border-blue-700/30 backdrop-blur-sm"
                         >
-                          <div className="text-xs font-semibold text-blue-700 mb-1">Requirements</div>
-                          <div className="text-xs text-slate-600">Create user stories</div>
+                          <div className="text-xs font-semibold text-blue-300 mb-1">Requirements</div>
+                          <div className="text-xs text-slate-400">Create user stories</div>
                         </button>
                         <button 
                           onClick={() => setInputMessage("Design a microservices architecture")}
-                          className="p-3 bg-purple-50 hover:bg-purple-100 rounded-lg text-left transition-colors border border-purple-200"
+                          className="p-3 bg-purple-900/30 hover:bg-purple-900/40 rounded-lg text-left transition-colors border border-purple-700/30 backdrop-blur-sm"
                         >
-                          <div className="text-xs font-semibold text-purple-700 mb-1">Architecture</div>
-                          <div className="text-xs text-slate-600">Design system</div>
+                          <div className="text-xs font-semibold text-purple-300 mb-1">Architecture</div>
+                          <div className="text-xs text-slate-400">Design system</div>
                         </button>
                         <button 
                           onClick={() => setInputMessage("Write code for REST API authentication")}
-                          className="p-3 bg-green-50 hover:bg-green-100 rounded-lg text-left transition-colors border border-green-200"
+                          className="p-3 bg-green-900/30 hover:bg-green-900/40 rounded-lg text-left transition-colors border border-green-700/30 backdrop-blur-sm"
                         >
-                          <div className="text-xs font-semibold text-green-700 mb-1">Development</div>
-                          <div className="text-xs text-slate-600">Generate code</div>
+                          <div className="text-xs font-semibold text-green-300 mb-1">Development</div>
+                          <div className="text-xs text-slate-400">Generate code</div>
                         </button>
                         <button 
                           onClick={() => setInputMessage("Perform security audit on the codebase")}
@@ -821,13 +821,13 @@ export default function Workspace() {
                           )}
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-1">
-                              <span className="text-xs font-semibold text-slate-900">{msg.agentName}</span>
+                              <span className="text-xs font-semibold text-white">{msg.agentName}</span>
                               <span className="text-xs text-slate-400">{new Date(msg.timestamp).toLocaleTimeString()}</span>
                             </div>
                             <div className={`px-4 py-3 rounded-2xl ${
                               msg.isUser 
                                 ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white' 
-                                : 'bg-slate-100 text-slate-900'
+                                : 'bg-slate-700/50 text-slate-100 border border-slate-600/30 backdrop-blur-sm'
                             } shadow-sm`}>
                               {msg.isUser ? (
                                 <p className="text-sm leading-relaxed">{msg.content}</p>
@@ -838,10 +838,10 @@ export default function Workspace() {
                             {msg.artifact && (
                               <button 
                                 onClick={() => setSelectedArtifact(msg.artifact!)}
-                                className="mt-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs hover:shadow-md transition-all flex items-center space-x-2"
+                                className="mt-2 px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-xs hover:bg-slate-600/50 hover:shadow-md transition-all flex items-center space-x-2"
                               >
                                 <span>📄</span>
-                                <span className="font-semibold text-slate-700">{msg.artifact.title}</span>
+                                <span className="font-semibold text-slate-200">{msg.artifact.title}</span>
                                 <span className="text-slate-400">→</span>
                               </button>
                             )}
@@ -875,10 +875,10 @@ export default function Workspace() {
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-1">
-                              <span className="text-xs font-semibold text-slate-900">{streamingMessage.agentName}</span>
+                              <span className="text-xs font-semibold text-white">{streamingMessage.agentName}</span>
                               <span className="text-xs text-slate-400">Typing...</span>
                             </div>
-                            <div className="px-4 py-3 rounded-2xl bg-slate-100 text-slate-900 shadow-sm">
+                            <div className="px-4 py-3 rounded-2xl bg-slate-700/50 text-slate-100 border border-slate-600/30 backdrop-blur-sm shadow-sm">
                               <MarkdownRenderer content={streamingMessage.content} />
                               <div className="flex gap-1 mt-2">
                                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
@@ -898,7 +898,7 @@ export default function Workspace() {
 
                 {/* Smart Prompts - Shows after agent response */}
                 {messages.length > 0 && messages[messages.length - 1]?.isUser === false && (
-                  <div className="px-6 py-3 border-t border-slate-200 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
+                  <div className="px-6 py-3 border-t border-slate-700/50 bg-gradient-to-r from-blue-900/20 to-purple-900/20 backdrop-blur-sm">
                     <SmartPrompts
                       lastMessage={messages[messages.length - 1]?.content}
                       context="code"
@@ -908,7 +908,7 @@ export default function Workspace() {
                 )}
 
                 {/* Input Area */}
-                <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 relative">
+                <div className="px-6 py-4 border-t border-slate-700/50 bg-slate-800/50 backdrop-blur-sm relative">
                   {/* Agent Selector & Mode Toggle - GitHub Copilot Style */}
                   <div className="mb-4 space-y-3 relative z-10">
                     <div className="flex items-center justify-between">
@@ -926,8 +926,8 @@ export default function Workspace() {
                           onClick={() => setChatMode('single')}
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             chatMode === 'single'
-                              ? 'bg-white text-blue-600 shadow-sm'
-                              : 'text-slate-600 hover:text-slate-900'
+                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                              : 'text-slate-300 hover:text-white'
                           }`}
                         >
                           Single Agent
@@ -936,8 +936,8 @@ export default function Workspace() {
                           onClick={() => setChatMode('team')}
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             chatMode === 'team'
-                              ? 'bg-white text-blue-600 shadow-sm'
-                              : 'text-slate-600 hover:text-slate-900'
+                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                              : 'text-slate-300 hover:text-white'
                           }`}
                         >
                           Team Mode
@@ -947,29 +947,29 @@ export default function Workspace() {
                     
                     {/* Mode Info */}
                     {chatMode === 'single' ? (
-                      <div className="flex items-start space-x-2 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex items-start space-x-2 px-4 py-3 bg-blue-900/30 border border-blue-700/30 rounded-lg backdrop-blur-sm">
+                        <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div>
-                          <p className="text-sm text-blue-900 font-medium">
+                          <p className="text-sm text-blue-300 font-medium">
                             Single Agent Mode Active
                           </p>
-                          <p className="text-xs text-blue-700 mt-1">
-                            Chatting with <strong>{selectedAgent.name}</strong> ({selectedAgent.role}) using <span className="font-mono bg-blue-100 px-1.5 py-0.5 rounded">{selectedAgent.modelName}</span>
+                          <p className="text-xs text-blue-400 mt-1">
+                            Chatting with <strong>{selectedAgent.name}</strong> ({selectedAgent.role}) using <span className="font-mono bg-blue-900/50 px-1.5 py-0.5 rounded">{selectedAgent.modelName}</span>
                           </p>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-start space-x-2 px-4 py-3 bg-purple-50 border border-purple-200 rounded-lg">
-                        <svg className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex items-start space-x-2 px-4 py-3 bg-purple-900/30 border border-purple-700/30 rounded-lg backdrop-blur-sm">
+                        <svg className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         <div>
-                          <p className="text-sm text-purple-900 font-medium">
+                          <p className="text-sm text-purple-300 font-medium">
                             Team Collaboration Mode Active
                           </p>
-                          <p className="text-xs text-purple-700 mt-1">
+                          <p className="text-xs text-purple-400 mt-1">
                             All 7 agents will collaborate with multi-round A2A discussions
                           </p>
                         </div>
@@ -991,11 +991,11 @@ export default function Workspace() {
                     {/* Upload Button */}
                     <button
                       onClick={() => setShowUploadModal(true)}
-                      className="px-4 py-3 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors flex items-center space-x-2"
+                      className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl hover:bg-slate-600/50 transition-colors flex items-center space-x-2"
                       title="Upload documents"
                     >
                       <span className="text-xl">📎</span>
-                      <span className="text-sm font-medium text-slate-700">Upload</span>
+                      <span className="text-sm font-medium text-slate-200">Upload</span>
                     </button>
                     
                     <textarea
@@ -1008,7 +1008,7 @@ export default function Workspace() {
                         }
                       }}
                       placeholder="Type your message... (Press Enter to send)"
-                      className="flex-1 px-4 py-3 border border-slate-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                      className="flex-1 px-4 py-3 bg-slate-700/50 border border-slate-600/50 text-slate-100 placeholder-slate-400 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm backdrop-blur-sm"
                       rows={3}
                     />
                     <button
@@ -1028,9 +1028,9 @@ export default function Workspace() {
 
             {/* RIGHT SIDEBAR - Artifacts Preview */}
             <div className="col-span-3 space-y-4">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 h-full">
-                <h2 className="text-sm font-bold text-slate-900 mb-3 flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-slate-700/50 p-4 h-full">
+                <h2 className="text-sm font-bold text-white mb-3 flex items-center">
+                  <svg className="w-4 h-4 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Generated Artifacts
@@ -1039,7 +1039,7 @@ export default function Workspace() {
                 {selectedArtifact ? (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="text-sm font-semibold text-slate-900">{selectedArtifact.title}</div>
+                      <div className="text-sm font-semibold text-white">{selectedArtifact.title}</div>
                       <button 
                         onClick={() => setSelectedArtifact(null)}
                         className="p-1 hover:bg-slate-100 rounded"
@@ -1080,7 +1080,7 @@ export default function Workspace() {
                         onClick={() => setSelectedArtifact(msg.artifact!)}
                         className="w-full p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-left transition-colors border border-slate-200"
                       >
-                        <div className="text-xs font-semibold text-slate-900 truncate">{msg.artifact?.title}</div>
+                        <div className="text-xs font-semibold text-white truncate">{msg.artifact?.title}</div>
                         <div className="text-xs text-slate-500">{msg.agentName}</div>
                       </button>
                     ))}
@@ -1095,14 +1095,14 @@ export default function Workspace() {
         {/* Document Upload Modal */}
         {showUploadModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-slate-700">
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900">Upload Documents</h2>
+                <h2 className="text-2xl font-bold text-white">Upload Documents</h2>
                 <button
                   onClick={() => setShowUploadModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
                 >
-                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -1139,10 +1139,10 @@ export default function Workspace() {
                 {/* Divider */}
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
+                    <div className="w-full border-t border-slate-700"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white text-gray-500">Or upload from device</span>
+                    <span className="px-4 bg-slate-800 text-slate-400">Or upload from device</span>
                   </div>
                 </div>
 
@@ -1161,10 +1161,10 @@ export default function Workspace() {
                 />
               </div>
               
-              <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3">
+              <div className="p-6 border-t border-slate-700 bg-slate-800/50 flex justify-end space-x-3">
                 <button
                   onClick={() => setShowUploadModal(false)}
-                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="px-6 py-2 bg-slate-700 text-slate-200 rounded-lg hover:bg-slate-600 transition-colors"
                 >
                   Cancel
                 </button>
@@ -1188,7 +1188,7 @@ export default function Workspace() {
         {/* GitHub Repository Browser Modal */}
         {showGitHubBrowser && githubToken && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-slate-700">
               <GitHubRepoBrowser
                 token={githubToken}
                 onFilesSelected={(files) => {
