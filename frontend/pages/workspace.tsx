@@ -921,13 +921,13 @@ export default function Workspace() {
                       />
                       
                       {/* Mode Toggle */}
-                      <div className="flex items-center space-x-2 bg-slate-100 rounded-lg p-1">
+                      <div className="flex items-center space-x-2 bg-slate-900/50 backdrop-blur-sm border border-slate-700/30 rounded-lg p-1">
                         <button
                           onClick={() => setChatMode('single')}
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             chatMode === 'single'
-                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                              : 'text-slate-300 hover:text-white'
+                              ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30'
+                              : 'text-slate-300 hover:text-white hover:bg-slate-700/30'
                           }`}
                         >
                           Single Agent
@@ -936,8 +936,8 @@ export default function Workspace() {
                           onClick={() => setChatMode('team')}
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             chatMode === 'team'
-                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                              : 'text-slate-300 hover:text-white'
+                              ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30'
+                              : 'text-slate-300 hover:text-white hover:bg-slate-700/30'
                           }`}
                         >
                           Team Mode
@@ -1042,9 +1042,9 @@ export default function Workspace() {
                       <div className="text-sm font-semibold text-white">{selectedArtifact.title}</div>
                       <button 
                         onClick={() => setSelectedArtifact(null)}
-                        className="p-1 hover:bg-slate-100 rounded"
+                        className="p-1 hover:bg-slate-700/50 rounded transition-colors"
                       >
-                        <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-slate-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
@@ -1056,7 +1056,7 @@ export default function Workspace() {
                       <button className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors">
                         Copy Code
                       </button>
-                      <button className="flex-1 px-3 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-300 transition-colors">
+                      <button className="flex-1 px-3 py-2 bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-600 transition-colors border border-slate-600">
                         Download
                       </button>
                     </div>
@@ -1071,17 +1071,17 @@ export default function Workspace() {
                   </div>
                 )}
 
-                <div className="mt-6 pt-4 border-t border-slate-200">
-                  <div className="text-xs font-semibold text-slate-700 mb-2">Recent Artifacts</div>
+                <div className="mt-6 pt-4 border-t border-slate-700/50">
+                  <div className="text-xs font-semibold text-white mb-2">Recent Artifacts</div>
                   <div className="space-y-2">
                     {messages.filter(m => m.artifact).map((msg, idx) => (
                       <button
                         key={idx}
                         onClick={() => setSelectedArtifact(msg.artifact!)}
-                        className="w-full p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-left transition-colors border border-slate-200"
+                        className="w-full p-2 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg text-left transition-colors border border-slate-600/30"
                       >
                         <div className="text-xs font-semibold text-white truncate">{msg.artifact?.title}</div>
-                        <div className="text-xs text-slate-500">{msg.agentName}</div>
+                        <div className="text-xs text-slate-400">{msg.agentName}</div>
                       </button>
                     ))}
                   </div>
@@ -1096,7 +1096,7 @@ export default function Workspace() {
         {showUploadModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
             <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-slate-700">
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
                 <h2 className="text-2xl font-bold text-white">Upload Documents</h2>
                 <button
                   onClick={() => setShowUploadModal(false)}
