@@ -41,7 +41,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
                 href={href} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-blue-600 hover:text-blue-800 underline hover:no-underline transition-colors"
+                className="text-cyan-400 hover:text-cyan-300 underline hover:no-underline transition-colors"
               >
                 {children}
               </a>
@@ -52,7 +52,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
           table({ children }) {
             return (
               <div className="overflow-x-auto my-4">
-                <table className="min-w-full border-collapse border border-slate-300">
+                <table className="min-w-full border-collapse border border-slate-600">
                   {children}
                 </table>
               </div>
@@ -60,12 +60,12 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
           },
           
           thead({ children }) {
-            return <thead className="bg-slate-100">{children}</thead>;
+            return <thead className="bg-slate-700/50">{children}</thead>;
           },
           
           th({ children }) {
             return (
-              <th className="border border-slate-300 px-4 py-2 text-left font-semibold text-slate-900">
+              <th className="border border-slate-600 px-4 py-2 text-left font-semibold text-white">
                 {children}
               </th>
             );
@@ -73,7 +73,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
           
           td({ children }) {
             return (
-              <td className="border border-slate-300 px-4 py-2 text-slate-700">
+              <td className="border border-slate-600 px-4 py-2 text-slate-200">
                 {children}
               </td>
             );
@@ -81,30 +81,30 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
           
           // Headings
           h1({ children }) {
-            return <h1 className="text-2xl font-bold text-slate-900 mt-6 mb-3">{children}</h1>;
+            return <h1 className="text-2xl font-bold text-white mt-6 mb-3">{children}</h1>;
           },
           
           h2({ children }) {
-            return <h2 className="text-xl font-bold text-slate-900 mt-5 mb-2">{children}</h2>;
+            return <h2 className="text-xl font-bold text-white mt-5 mb-2">{children}</h2>;
           },
           
           h3({ children }) {
-            return <h3 className="text-lg font-semibold text-slate-900 mt-4 mb-2">{children}</h3>;
+            return <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>;
           },
           
           // Lists
           ul({ children }) {
-            return <ul className="list-disc list-inside my-2 space-y-1 text-slate-700">{children}</ul>;
+            return <ul className="list-disc list-inside my-2 space-y-1 text-slate-200">{children}</ul>;
           },
           
           ol({ children }) {
-            return <ol className="list-decimal list-inside my-2 space-y-1 text-slate-700">{children}</ol>;
+            return <ol className="list-decimal list-inside my-2 space-y-1 text-slate-200">{children}</ol>;
           },
           
           // Blockquotes
           blockquote({ children }) {
             return (
-              <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-3 bg-blue-50 text-slate-700 italic">
+              <blockquote className="border-l-4 border-cyan-500 pl-4 py-2 my-3 bg-cyan-900/20 text-slate-200 italic">
                 {children}
               </blockquote>
             );
@@ -112,22 +112,22 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
           
           // Paragraphs
           p({ children }) {
-            return <p className="my-2 text-slate-700 leading-relaxed">{children}</p>;
+            return <p className="my-2 text-slate-200 leading-relaxed">{children}</p>;
           },
           
           // Horizontal rule
           hr() {
-            return <hr className="my-4 border-t border-slate-300" />;
+            return <hr className="my-4 border-t border-slate-600" />;
           },
           
           // Strong/Bold
           strong({ children }) {
-            return <strong className="font-bold text-slate-900">{children}</strong>;
+            return <strong className="font-bold text-white">{children}</strong>;
           },
           
           // Emphasis/Italic
           em({ children }) {
-            return <em className="italic text-slate-700">{children}</em>;
+            return <em className="italic text-slate-300">{children}</em>;
           },
         }}
       >
