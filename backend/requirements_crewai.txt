@@ -1,0 +1,22 @@
+# CrewAI Integration Dependencies (Latest Stable)
+crewai>=0.201.1
+crewai-tools>=0.75.0
+langchain>=0.3.27
+langchain-community>=0.3.30
+langchain-core>=0.3.78
+langchain-groq>=0.2.0
+
+# Tool dependencies
+duckduckgo-search>=8.1.1  # Web search
+requests>=2.32.5
+beautifulsoup4>=4.14.2
+httpx>=0.28.1
+
+# Existing dependencies (ensure compatibility)
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+websockets>=12.0
+python-multipart>=0.0.6
+python-dotenv>=1.1.1
+groq>=0.4.1
+pydantic>=2.11.10
