@@ -2,25 +2,50 @@
 CrewAI-Powered Agents - Real Autonomous Agent System
 This replaces the simple keyword-based routing with true agent orchestration
 """
-from crewai import Agent, Task, Crew, Process
-from langchain_groq import ChatGroq
+from crewai import Agent, Task, Crew, Process, LLM
 from crewai_tools import tool
 import os
 from typing import List, Dict, Any, Optional
 import json
 
-# Initialize Groq LLM for CrewAI
+# Initialize LLM for CrewAI - OpenRouter provides FREE access to Gemini!
 def get_groq_llm():
-    """Get Groq LLM instance for CrewAI agents"""
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        raise ValueError("GROQ_API_KEY not found in environment")
+    """Get LLM instance for CrewAI agents - Uses OpenRouter for FREE AI access"""
     
-    return ChatGroq(
-        api_key=api_key,
-        model="llama-3.1-70b-versatile",
-        temperature=0.7,
-        max_tokens=2000
+    # Try OpenRouter first (RECOMMENDED - FREE models)
+    openrouter_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_key:
+        return LLM(
+            model="openrouter/meta-llama/llama-3.2-3b-instruct:free",  # FREE & Working!
+            api_key=openrouter_key,
+            temperature=0.7,
+            base_url="https://openrouter.ai/api/v1"
+        )
+    
+    # Fallback to OpenAI if available
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if openai_key:
+        return LLM(
+            model="gpt-4o-mini",  # Cheaper OpenAI model
+            api_key=openai_key,
+            temperature=0.7
+        )
+    
+    # Last resort: Try Groq
+    groq_key = os.getenv("GROQ_API_KEY")
+    if groq_key:
+        return LLM(
+            model="groq/llama-3.1-70b-versatile",  # Try Llama model
+            api_key=groq_key,
+            temperature=0.7
+        )
+    
+    raise ValueError(
+        "No AI provider API key found! Please set one of:\n"
+        "- OPENROUTER_API_KEY (RECOMMENDED - FREE Gemini access)\n"
+        "- OPENAI_API_KEY (Paid but most reliable)\n"
+        "- GROQ_API_KEY (FREE but limited models)\n"
+        "\nGet OpenRouter key (FREE): https://openrouter.ai/keys"
     )
 
 
