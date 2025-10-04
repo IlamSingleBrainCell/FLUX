@@ -27,6 +27,12 @@ import { MultiFileUpload } from '../components/Workspace/MultiFileUpload';
 import { AgentPerformance } from '../components/Workspace/AgentPerformance';
 import { KeyboardShortcutsPanel, useKeyboardShortcuts } from '../components/Workspace/KeyboardShortcuts';
 import { TemplateLibrary } from '../components/Workspace/TemplateLibrary';
+import { ExportMenu } from '../components/Workspace/ExportMenu';
+import { AgentOrchestrator } from '../components/Workspace/AgentOrchestrator';
+
+// Utilities for new features
+import { streamChatResponse, StreamController } from '../utils/streamingResponse';
+import { createPromptWithFileContext, analyzeFiles } from '../utils/fileContextManager';
 
 interface Message {
   id: string;
@@ -85,8 +91,12 @@ export default function Workspace() {
     content: string;
   } | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const streamControllerRef = useRef<StreamController>(new StreamController());
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Orchestrator state
+  const [showOrchestrator, setShowOrchestrator] = useState(false);
+  const [orchestratorTasks, setOrchestratorTasks] = useState<any[]>([]);
 
   // New feature states
   const [messageReactions, setMessageReactions] = useState<Record<string, any[]>>({});
@@ -214,6 +224,112 @@ export default function Workspace() {
     setShowTemplates(false);
   };
 
+  // Regenerate message function
+  const handleRegenerateMessage = async (messageId: string) => {
+    const messageIndex = messages.findIndex(m => m.id === messageId);
+    if (messageIndex < 0) return;
+
+    const message = messages[messageIndex];
+    
+    // Find the original user message (should be right before this one)
+    const userMessage = messages[messageIndex - 1];
+    if (!userMessage || !userMessage.isUser) {
+      console.error('Could not find user message to regenerate');
+      return;
+    }
+
+    // Remove the old agent response
+    setMessages(prev => prev.filter(m => m.id !== messageId));
+
+    // Resend the user's message
+    const targetAgentId = message.agentId;
+    const targetAgent = enterpriseAgents.find(a => a.id === targetAgentId);
+    
+    if (!targetAgent) return;
+
+    // Bring agent online and show typing
+    bringAgentOnline(targetAgentId);
+    setAgentStatuses(prev => 
+      prev.map(status => 
+        status.id === targetAgentId 
+          ? { ...status, status: 'typing' as const }
+          : status
+      )
+    );
+
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          message: userMessage.content,
+          chat_mode: chatMode
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Add new response
+      if (data.responses && Array.isArray(data.responses)) {
+        data.responses.forEach((resp: any) => {
+          const agentMsg: Message = {
+            id: `msg_${Date.now()}_${resp.agent}_regen`,
+            agentId: resp.agent || targetAgentId,
+            agentName: resp.agent_name || targetAgent.name,
+            content: resp.message,
+            timestamp: new Date().toISOString(),
+            artifact: resp.artifact || undefined
+          };
+
+          setMessages(prev => [...prev, agentMsg]);
+        });
+      }
+
+      setAgentStatuses(prev => 
+        prev.map(status => 
+          status.id === targetAgentId 
+            ? { ...status, status: 'online' as const }
+            : status
+        )
+      );
+    } catch (error) {
+      console.error('Regeneration error:', error);
+      setAgentStatuses(prev => 
+        prev.map(status => 
+          status.id === targetAgentId 
+            ? { ...status, status: 'offline' as const }
+            : status
+        )
+      );
+    }
+  };
+
+  // Stop streaming function
+  const handleStopStreaming = () => {
+    streamControllerRef.current.abort();
+    setIsStreaming(false);
+    
+    // Add incomplete streaming message to messages
+    if (streamingMessage) {
+      const msg: Message = {
+        id: `msg_${Date.now()}_stream`,
+        agentId: streamingMessage.agentId,
+        agentName: streamingMessage.agentName,
+        content: streamingMessage.content + '\n\n[Response stopped by user]',
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, msg]);
+      setStreamingMessage(null);
+    }
+  };
+
   // Simulate agent coming online when called
   const bringAgentOnline = (agentId: string) => {
     setAgentStatuses(prev => 
@@ -255,6 +371,14 @@ export default function Workspace() {
 
     setShowWelcome(false);
 
+    // Prepare message with file context if files are uploaded
+    let finalMessage = inputMessage;
+    if (uploadedFiles.length > 0) {
+      const fileAnalysis = analyzeFiles(uploadedFiles);
+      console.log('File analysis:', fileAnalysis);
+      finalMessage = createPromptWithFileContext(inputMessage, uploadedFiles);
+    }
+
     // Add user message
     const userMsg: Message = {
       id: `msg_${Date.now()}`,
@@ -268,14 +392,14 @@ export default function Workspace() {
     setMessages(prev => [...prev, userMsg]);
 
     // Prepare message based on chat mode
-    let messageToSend = inputMessage;
+    let messageToSend = finalMessage;
     let targetAgentId: string;
     
     if (chatMode === 'single') {
       // Single agent mode - target the selected agent directly
       targetAgentId = selectedAgent.id;
       // Prepend agent name to message to ensure backend routes to correct agent
-      messageToSend = `${selectedAgent.name} ${inputMessage}`;
+      messageToSend = `${selectedAgent.name} ${finalMessage}`;
     } else {
       // Team mode - detect which agent(s) to call
       const detectAgent = (msg: string): string => {
@@ -600,6 +724,10 @@ export default function Workspace() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      <ExportMenu 
+                        messages={messages}
+                        conversationTitle={currentConversationId ? `Conversation ${currentConversationId.slice(0, 8)}` : 'AI Workspace Chat'}
+                      />
                       <button
                         onClick={() => setShowShortcuts(true)}
                         className="px-3 py-1.5 hover:bg-slate-100 rounded-lg text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-1.5"
@@ -724,7 +852,7 @@ export default function Workspace() {
                                 reactions={messageReactions[msg.id]}
                                 onReact={(emoji) => handleReact(msg.id, emoji)}
                                 onCopy={() => navigator.clipboard.writeText(msg.content)}
-                                onRegenerate={() => console.log('Regenerate:', msg.id)}
+                                onRegenerate={() => handleRegenerateMessage(msg.id)}
                                 onPin={() => togglePin(msg.id)}
                                 onRate={(rating) => handleRateMessage(msg.id, rating)}
                                 isPinned={pinnedMessages.some(p => p.id === msg.id)}
@@ -1089,6 +1217,19 @@ export default function Workspace() {
           onSelectTemplate={handleSelectTemplate}
           onClose={() => setShowTemplates(false)}
           isOpen={showTemplates}
+        />
+
+        {/* Agent Orchestrator - Shows multi-agent workflow */}
+        <AgentOrchestrator
+          agents={enterpriseAgents.map(a => ({
+            id: a.id,
+            name: a.name,
+            avatar: a.avatar,
+            role: a.role
+          }))}
+          onWorkflowComplete={(tasks) => {
+            console.log('Workflow completed:', tasks);
+          }}
         />
       </div> {/* Close min-h-screen Div */}
     </>
